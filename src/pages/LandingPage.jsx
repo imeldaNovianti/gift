@@ -696,7 +696,7 @@ const LuxuryGraduationPage = () => {
             className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-4 rounded-full shadow-xl flex items-center gap-3"
           >
             <CheckCircle size={24} />
-            <span className="font-semibold">✅ Piagam berhasil diunduh! Simpan kenangan manismu</span>
+            <span className="font-semibold">✅ yeaay Piagam berhasil diunduh! Simpan kenangan manismu</span>
           </motion.div>
         )}
       </AnimatePresence>
