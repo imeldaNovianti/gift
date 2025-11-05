@@ -96,29 +96,29 @@ const LuxuryGraduationPage = () => {
   const steps = [
     {
       type: "opening",
-      title: "Untuk Cintaku, Haejay!",
-      message: "Selamat ya sayang! Akhirnya kamu berhasil menyelesaikan perjalanan akademismu...",
+      title: "Haejy S A.md,kep!",
+      message: "Selamat yaa! Akhirnya berhasil menyelesaikan perjalanan awal ini...",
       image: pasfoto,
-      buttonText: "Lihat Kejutan Spesialku",
-      personalMessage: "Aku bangga banget sama kamu!",
+      buttonText: "OPEN THIS SURPRISE",
+      personalMessage: "IM PROUD OF U",
       music: "romantic"
     },
     {
       type: "certificate",
-      title: "Surat Cinta & Kebanggaan",
-      message: "Dari pacarmu yang selalu mendukungmu",
+      title: "Surat & Kebanggaan",
+      message: "From your lover who always supports you.",
       image: piagam,
       personalMessage: "Setiap tetes keringat dan usahamu akhirnya terbayar sudah. Kamu hebat!",
       loveNotes: [
-        "Aku selalu bangga sama perjuanganmu",
-        "Dari belajar sampai larut malam sampai presentasi",
-        "Kamu selalu memberikan yang terbaik",
-        "Impianmu kini menjadi kenyataan",
-        "Kamu adalah bintang dalam hidupku"
+"I’m always proud of your hard work",
+"From studying late at night to giving presentations",
+"You always give your very best",
+"Your dream has now become reality",
+"You are the star in my life"
       ],
       music: "proud",
       certificateInfo: {
-        from: "Pacarmu yang selalu mendukung",
+        from: "💖 From your partner who always believes in you and stands by you.",
         to: "Haejay Bau Kucaay",
         date: "November 2024",
         message: "Untuk cintaku yang telah berhasil menyelesaikan studi dengan gemilang. Semoga prestasi ini menjadi awal dari kesuksesanmu yang lebih besar. Aku selalu bangga padamu!"
@@ -126,43 +126,47 @@ const LuxuryGraduationPage = () => {
     },
     {
       type: "memories",
-      title: "Kenangan Manis Kita",
-      message: "Momen-momen berharga yang kita lalui bersama",
+      title: "OUR GALLERY",
+      message: "Momen-momen berharga",
       images: [
         { 
           src: fs1, 
           caption: "Dukungan di Setiap Langkah", 
-          description: "Aku selalu ada di sampingmu, melalui suka dan duka perkuliahan",
-          date: "2022"
+          description: "I’m always by your side, through the joys and struggles of college"
+,
+          date: "2023"
         },
         { 
           src: fs2, 
           caption: "Celebrations Together", 
-          description: "Merayakan setiap pencapaian kecil dan besar bersamamu",
+          description: "Merayakan setiap pencapaian kecil dan besar",
           date: "2023"
         },
         { 
           src: fs3, 
           caption: "Moments of Joy", 
-          description: "Senyummu adalah semangatku, kebahagiaanmu adalah inspirasiku",
+          description: "semoga berbahagia selalu",
           date: "2024"
         },
         { 
           src: fs4, 
           caption: "Future Dreams", 
-          description: "Bersama kita akan menciptakan lebih banyak kenangan indah",
+          description: "Together, we will create even more beautiful memories"
+,
           date: "Sekarang"
         },
         { 
           src: jay1, 
           caption: "Sweet Moments", 
-          description: "Setiap detik bersamamu adalah kenangan yang tak terlupakan",
+          description:"Every second with you is an unforgettable memory"
+,
           date: "2023"
         },
         { 
           src: jaypp1, 
           caption: "Our Journey", 
-          description: "Perjalanan kita penuh dengan cinta dan tawa",
+          description: "Our journey is filled with love and laughter"
+,
           date: "2024"
         },
         { 
@@ -179,59 +183,58 @@ const LuxuryGraduationPage = () => {
       title: "Surat Cinta Untukmu",
       message: "Dari hatiku yang paling dalam...",
       letter: [
-        "My Dearest Haejay,",
-        "",
-        "Hari ini adalah hari yang sangat spesial...",
-        "Melihat kamu berhasil menyelesaikan studi membuat hatiku berbunga-bunga.",
-        "Aku masih ingat betul semua perjuanganmu:",
-        "- Begadang mengerjakan tugas sampai subuh",
-        "- Stres menghadapi ujian yang bertubi-tubi", 
-        "- Semangatmu yang tak pernah padam meski lelah",
-        "",
-        "Tapi lihatlah sekarang...",
-        "Semua kerja keras itu akhirnya membuahkan hasil!",
-        "Kamu tidak hanya lulus, tapi lulus dengan membanggakan.",
-        "",
-        "Aku bangga padamu, lebih dari kata-kata yang bisa kuucapkan.",
-        "Kamu adalah inspirasi bagiku dan banyak orang.",
-        "",
-        "Ini bukan akhir, tapi awal yang indah...",
-        "Aku tak sabar melihat semua impianmu menjadi kenyataan.",
-        "Dan aku berjanji akan selalu ada di sampingmu,",
-        "mendukung setiap langkah, merayakan setiap kesuksesan.",
-        "",
-        "Congratulations, my love!",
-        "The world is yours to conquer!",
-        "",
-        "Forever proud of you,",
-        "Pacarmu yang selalu mencintaimu"
+"My Dearest Haejay,",
+"",
+"Today is such a special day...",
+"Seeing you successfully complete your studies makes my heart bloom with joy.",
+"I still vividly remember all your struggles:",
+"- The stress of facing countless exams",
+"- Your unyielding spirit even when you were tired",
+"",
+"But look at you now...",
+"All that hard work has finally paid off!",
+"You didn’t just graduate, you graduated with pride.",
+"",
+"I’m so proud of you, more than words can express.",
+"You are an inspiration to me and to many others.",
+"",
+"This is not the end, but a beautiful beginning...",
+"I can’t wait to see all your dreams come true.",
+"And I promise I’ll always be by your side,",
+"supporting every step and celebrating every success.",
+"",
+"Congratulations, my love!",
+"The world is yours to conquer!",
+"",
+"Forever proud of you,",
+"Your girlfriend who will always love you"
       ],
       music: "intimate"
     },
     {
       type: "future",
       title: "Masa Depan Kita",
-      message: "Bersama kita akan menaklukkan dunia!",
+      message: "semoga selalu dilindungi yaa!",
       dreams: [
         {
           icon: "🏠",
           title: "Rumah Impian",
-          description: "Membangun keluarga yang penuh cinta dan kebahagiaan"
+          description: "Membangun keluarga yang penuh cinta dan kebahagiaan,ehehehhe"
         },
         {
           icon: "✈️",
           title: "Petualangan Bersama", 
-          description: "Menjelajahi dunia dan membuat kenangan tak terlupakan"
+          description: "Menjelajahi dunia dan membuat kenangan tak terlupakan,aminin yaa"
         },
         {
           icon: "💼",
           title: "Karier Gemilang",
-          description: "Mendukung karirmu yang cemerlang dan penuh prestasi"
+          description: "Mendukung karirmu yang cemerlang dan penuh prestasi,selalu jadi doa"
         },
         {
           icon: "❤️",
-          title: "Cinta Abadi",
-          description: "Tetap saling mencintai dan mendukung selamanya"
+          title: "love",
+          description: "Tetap saling mencintai dan mendukung selamanya yaa,jangan bosen yakinin aku na nyaa"
         }
       ],
       music: "optimistic"
@@ -1263,8 +1266,9 @@ const LuxuryGraduationPage = () => {
                   transition={{ delay: 1.2 }}
                   className={`${isDarkMode ? 'bg-slate-800' : 'bg-gradient-to-r from-indigo-100 to-purple-100'} rounded-3xl p-8 text-center mb-8`}
                 >
-                  <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>Aku tidak sabar untuk memulai babak baru bersamamu!</h2>
-                  <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6`} style={{ fontFamily: 'Poppins, sans-serif' }}>Terima kasih sudah menjadi inspirasi dalam hidupku. Aku akan selalu ada untukmu, dalam suka maupun duka.</p>
+                  <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>"I can’t wait to start a new chapter with you!"
+</h2>
+<p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6`} style={{ fontFamily: 'Poppins, sans-serif' }}>Thank you for being an inspiration in my life. I will always be there for you, through joys and sorrows.</p>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
