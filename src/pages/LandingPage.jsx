@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import Confetti from "react-confetti";
 import { 
   Heart, 
@@ -30,10 +30,15 @@ import {
   MessageCircle,
   Gift,
   X,
+  CheckCircle,
   ZoomIn,
   ZoomOut,
-  Mail,
-  MessageSquare
+  Sun,
+  Moon,
+  Maximize2,
+  Minimize2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 import pasfoto from '../assets/pasfoto.jpg';
@@ -43,8 +48,6 @@ import fs2 from '../assets/fs2.jpg';
 import fs3 from '../assets/fs3.jpg';
 import fs4 from '../assets/fs4.jpg';
 import backgroundMusic from '../assets/music/Laskar Pelangi - Nidji.mp3';
-import cheerSound from '../assets/music/Laskar Pelangi - Nidji.mp3';
-
 
 const LuxuryGraduationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -54,22 +57,23 @@ const LuxuryGraduationPage = () => {
   const [showSurprise, setShowSurprise] = useState(false);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [showDownloadSuccess, setShowDownloadSuccess] = useState(false);
-  const [isDraggingEmoji, setIsDraggingEmoji] = useState(false);
-  const [revealedMessage, setRevealedMessage] = useState(false);
-  const [showHiddenMessage, setShowHiddenMessage] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [imageZoom, setImageZoom] = useState(1);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showPersonalizedConfetti, setShowPersonalizedConfetti] = useState(false);
+  const [typewriterText, setTypewriterText] = useState('');
+  const [countdown, setCountdown] = useState(10);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [secretMessage, setSecretMessage] = useState('');
+  const [showSecretMessage, setShowSecretMessage] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [typewriterText, setTypewriterText] = useState("");
-  const [typewriterIndex, setTypewriterIndex] = useState(0);
 
   const audioRef = useRef(null);
-  const cheerAudioRef = useRef(null);
-  const certificateRef = useRef(null);
-  const emojiRef = useRef(null);
+  const cheerSoundRef = useRef(null);
+  const controls = useAnimation();
 
   // Data untuk setiap step - DIUBAH MENJADI LEBIH PERSONAL DAN SWEET
   const steps = [
@@ -79,7 +83,8 @@ const LuxuryGraduationPage = () => {
       message: "Selamat ya sayang! Akhirnya kamu berhasil menyelesaikan perjalanan akademismu...",
       image: pasfoto,
       buttonText: "Lihat Kejutan Spesialku ✨",
-      personalMessage: "Aku bangga banget sama kamu! 💕"
+      personalMessage: "Aku bangga banget sama kamu! 💕",
+      music: "romantic"
     },
     {
       type: "certificate",
@@ -94,11 +99,12 @@ const LuxuryGraduationPage = () => {
         "🎯 Impianmu kini menjadi kenyataan",
         "👑 Kamu adalah bintang dalam hidupku"
       ],
-      certificateDetails: {
-        from: "Pacarmu",
-        to: "Haejay",
+      music: "proud",
+      certificateInfo: {
+        from: "Pacarmu yang selalu mendukung",
+        to: "Haejay Bau Kucaay",
         date: "November 2024",
-        personalMessage: "Untuk Haejay tercinta, kamu telah membuktikan bahwa kerja keras dan ketekunan membuahkan hasil yang manis. Aku bangga padamu lebih dari kata-kata yang bisa kuucapkan. Teruslah bersinar, sayang! 💖"
+        message: "Untuk cintaku yang telah berhasil menyelesaikan studi dengan gemilang. Semoga prestasi ini menjadi awal dari kesuksesanmu yang lebih besar. Aku selalu bangga padamu!"
       }
     },
     {
@@ -130,7 +136,8 @@ const LuxuryGraduationPage = () => {
           description: "Bersama kita akan menciptakan lebih banyak kenangan indah",
           date: "Sekarang"
         }
-      ]
+      ],
+      music: "nostalgic"
     },
     {
       type: "love_letter",
@@ -163,7 +170,8 @@ const LuxuryGraduationPage = () => {
         "",
         "Forever proud of you,",
         "Pacarmu yang selalu mencintaimu 💕"
-      ]
+      ],
+      music: "intimate"
     },
     {
       type: "future",
@@ -190,26 +198,10 @@ const LuxuryGraduationPage = () => {
           title: "Cinta Abadi",
           description: "Tetap saling mencintai dan mendukung selamanya"
         }
-      ]
+      ],
+      music: "optimistic"
     }
   ];
-
-  // Typewriter effect untuk pesan personal
-  useEffect(() => {
-    if (showCertificateModal) {
-      const message = steps[1].certificateDetails.personalMessage;
-      if (typewriterIndex < message.length) {
-        const timer = setTimeout(() => {
-          setTypewriterText(prev => prev + message[typewriterIndex]);
-          setTypewriterIndex(prev => prev + 1);
-        }, 50);
-        return () => clearTimeout(timer);
-      }
-    } else {
-      setTypewriterText("");
-      setTypewriterIndex(0);
-    }
-  }, [typewriterIndex, showCertificateModal]);
 
   // Background music dengan file lokal
   useEffect(() => {
@@ -217,6 +209,43 @@ const LuxuryGraduationPage = () => {
       audioRef.current.play().catch(console.log);
     }
   }, []);
+
+  // Typewriter effect
+  useEffect(() => {
+    if (currentStep === 1) {
+      const text = steps[1].personalMessage;
+      let index = 0;
+      setTypewriterText('');
+      
+      const interval = setInterval(() => {
+        if (index < text.length) {
+          setTypewriterText(prev => prev + text[index]);
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 50);
+      
+      return () => clearInterval(interval);
+    }
+  }, [currentStep]);
+
+  // Countdown effect
+  useEffect(() => {
+    if (showCountdown && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    } else if (countdown === 0 && showCountdown) {
+      setShowCountdown(false);
+      setCountdown(10);
+      // Trigger confetti when countdown reaches 0
+      setShowPersonalizedConfetti(true);
+      setTimeout(() => setShowPersonalizedConfetti(false), 5000);
+    }
+  }, [countdown, showCountdown]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -261,102 +290,83 @@ const LuxuryGraduationPage = () => {
     setCurrentStep(prev => Math.max(0, prev - 1));
   };
 
+  const openCertificateModal = () => {
+    setShowCertificateModal(true);
+    // Play cheer sound
+    if (cheerSoundRef.current) {
+      cheerSoundRef.current.play().catch(console.log);
+    }
+    // Start countdown
+    setShowCountdown(true);
+    // Show personalized confetti
+    setShowPersonalizedConfetti(true);
+    setTimeout(() => setShowPersonalizedConfetti(false), 5000);
+  };
+
   const downloadCertificate = () => {
     const link = document.createElement('a');
     link.href = piagam;
     link.download = 'Piagam-Kebanggaan-Haejay.jpg';
     link.click();
     
-    // Tampilkan notifikasi sukses
+    // Show success notification
+    setShowCertificateModal(false);
     setShowDownloadSuccess(true);
     setTimeout(() => setShowDownloadSuccess(false), 3000);
   };
 
-  const shareMessage = (platform) => {
+  const shareMessage = () => {
     const text = "💖 Lihat kejutan spesial dari pacar untuk Haejay yang baru lulus! 🎓✨ Ayo beri selamat untuknya! 🌟";
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const shareToEmail = () => {
+    const subject = "Selamat Wisuda, Haejay! 🎓";
+    const body = "Hai, aku ingin berbagi kebahagiaan. Lihat kejutan spesial yang aku buat untuk Haejay yang baru lulus! 💖";
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const shareToSocial = (platform) => {
     const url = window.location.href;
+    const text = "💖 Lihat kejutan spesial dari pacar untuk Haejay yang baru lulus! 🎓✨";
     
-    let shareUrl = "";
-    switch(platform) {
-      case 'whatsapp':
-        shareUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
-        break;
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
-        break;
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-        break;
-      case 'email':
-        shareUrl = `mailto:?subject=Kejutan Spesial untuk Haejay&body=${encodeURIComponent(text + " " + url)}`;
-        break;
-      default:
-        return;
+    if (platform === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    } else if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     }
-    
-    window.open(shareUrl, '_blank');
-  };
-
-  const showCertificateSurprise = () => {
-    setShowSurprise(true);
-    setTimeout(() => setShowSurprise(false), 3000);
-  };
-
-  const openCertificateModal = () => {
-    setShowCertificateModal(true);
-    // Play cheer sound
-    if (cheerAudioRef.current) {
-      cheerAudioRef.current.play().catch(console.log);
-    }
-  };
-
-  const closeCertificateModal = () => {
-    setShowCertificateModal(false);
-    setZoomLevel(1);
-    setRevealedMessage(false);
-    setShowHiddenMessage(false);
-  };
-
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.2, 3));
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.2, 0.5));
-  };
-
-  const handleDragStart = (e) => {
-    setIsDraggingEmoji(true);
-    e.dataTransfer.setData('text/plain', 'emoji');
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDraggingEmoji(false);
-    setRevealedMessage(true);
-    
-    // Tampilkan pesan rahasia setelah beberapa detik
-    setTimeout(() => {
-      setShowHiddenMessage(true);
-    }, 1000);
   };
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const zoomIn = () => {
+    setImageZoom(prev => Math.min(prev + 0.2, 3));
+  };
+
+  const zoomOut = () => {
+    setImageZoom(prev => Math.max(prev - 0.2, 1));
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % steps[2].images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + steps[2].images.length) % steps[2].images.length);
+  };
+
+  const revealSecretMessage = () => {
+    setSecretMessage("Aku akan selalu mencintaimu, tidak peduli seberapa sulit jalan yang kita lalui. Bersama kita bisa melewati apa pun! 💕");
+    setShowSecretMessage(true);
+    setTimeout(() => setShowSecretMessage(false), 5000);
+  };
+
   const currentStepData = steps[Math.min(currentStep, steps.length - 1)];
 
   return (
-    <div className={`min-h-screen font-sans relative overflow-hidden transition-colors duration-500 ${
-      isDarkMode 
-        ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white' 
-        : 'bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 text-gray-800'
-    }`}>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900' : 'bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50'} font-sans relative overflow-hidden transition-colors duration-500`}>
       {/* Background Music */}
       <audio
         ref={audioRef}
@@ -367,8 +377,8 @@ const LuxuryGraduationPage = () => {
       
       {/* Cheer Sound Effect */}
       <audio
-        ref={cheerAudioRef}
-        src={cheerSound}
+        ref={cheerSoundRef}
+        src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
       />
       
       {/* Animated Background */}
@@ -395,10 +405,10 @@ const LuxuryGraduationPage = () => {
               delay: Math.random() * 3
             }}
           >
-            {i % 4 === 0 ? <span className={`text-2xl ${isDarkMode ? 'text-pink-400' : 'text-pink-300'}`}>💖</span> :
-             i % 4 === 1 ? <span className={`text-2xl ${isDarkMode ? 'text-purple-400' : 'text-purple-300'}`}>🌟</span> :
-             i % 4 === 2 ? <span className={`text-2xl ${isDarkMode ? 'text-blue-400' : 'text-blue-300'}`}>🎓</span> :
-             <span className={`text-2xl ${isDarkMode ? 'text-red-400' : 'text-red-300'}`}>🥰</span>}
+            {i % 4 === 0 ? <span className={`${isDarkMode ? 'text-pink-400' : 'text-pink-300'} text-2xl`}>💖</span> :
+             i % 4 === 1 ? <span className={`${isDarkMode ? 'text-purple-400' : 'text-purple-300'} text-2xl`}>🌟</span> :
+             i % 4 === 2 ? <span className={`${isDarkMode ? 'text-blue-400' : 'text-blue-300'} text-2xl`}>🎓</span> :
+             <span className={`${isDarkMode ? 'text-red-400' : 'text-red-300'} text-2xl`}>🥰</span>}
           </motion.div>
         ))}
       </div>
@@ -408,44 +418,35 @@ const LuxuryGraduationPage = () => {
         <motion.button
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
+          onClick={toggleTheme}
+          className={`p-3 ${isDarkMode ? 'bg-gray-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl hover:bg-white transition-all duration-300 border ${isDarkMode ? 'border-gray-700' : 'border-pink-200'}`}
+        >
+          {isDarkMode ? 
+            <Sun size={22} className="text-yellow-400" /> : 
+            <Moon size={22} className="text-pink-600" />
+          }
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
           onClick={toggleMusic}
-          className={`p-3 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${
-            isDarkMode 
-              ? 'bg-gray-800/90 backdrop-blur-sm border-purple-500 text-white' 
-              : 'bg-white/90 backdrop-blur-sm border-pink-200 text-pink-600'
-          }`}
+          className={`p-3 ${isDarkMode ? 'bg-gray-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl hover:bg-white transition-all duration-300 border ${isDarkMode ? 'border-gray-700' : 'border-pink-200'}`}
         >
           {isPlaying ? 
-            <Pause size={22} /> : 
-            <Play size={22} />
+            <Pause size={22} className={isDarkMode ? "text-pink-400" : "text-pink-600"} /> : 
+            <Play size={22} className={isDarkMode ? "text-pink-400" : "text-pink-600"} />
           }
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.1, rotate: -5 }}
           whileTap={{ scale: 0.9 }}
           onClick={toggleMute}
-          className={`p-3 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${
-            isDarkMode 
-              ? 'bg-gray-800/90 backdrop-blur-sm border-purple-500 text-white' 
-              : 'bg-white/90 backdrop-blur-sm border-pink-200 text-pink-600'
-          }`}
+          className={`p-3 ${isDarkMode ? 'bg-gray-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl hover:bg-white transition-all duration-300 border ${isDarkMode ? 'border-gray-700' : 'border-pink-200'}`}
         >
           {isMuted ? 
-            <VolumeX size={22} /> : 
-            <Volume2 size={22} />
+            <VolumeX size={22} className={isDarkMode ? "text-pink-400" : "text-pink-600"} /> : 
+            <Volume2 size={22} className={isDarkMode ? "text-pink-400" : "text-pink-600"} />
           }
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={toggleTheme}
-          className={`p-3 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${
-            isDarkMode 
-              ? 'bg-gray-800/90 backdrop-blur-sm border-purple-500 text-white' 
-              : 'bg-white/90 backdrop-blur-sm border-pink-200 text-pink-600'
-          }`}
-        >
-          {isDarkMode ? <Sparkles size={22} /> : <Sparkles size={22} />}
         </motion.button>
       </div>
 
@@ -455,34 +456,41 @@ const LuxuryGraduationPage = () => {
           width={windowSize.width}
           height={windowSize.height}
           numberOfPieces={400}
-          colors={isDarkMode 
-            ? ['#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
-            : ['#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
-          }
+          colors={['#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']}
         />
       )}
 
-      {/* Surprise Animation */}
-      <AnimatePresence>
-        {showSurprise && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          >
+      {/* Personalized Confetti */}
+      {showPersonalizedConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-40">
+          {[...Array(50)].map((_, i) => (
             <motion.div
-              initial={{ y: 100, rotate: -10 }}
-              animate={{ y: 0, rotate: 0 }}
-              className="bg-gradient-to-br from-pink-400 to-purple-500 text-white p-8 rounded-3xl shadow-2xl text-center max-w-md mx-4"
+              key={i}
+              className="absolute text-2xl"
+              initial={{ 
+                x: Math.random() * windowSize.width,
+                y: -50,
+                rotate: Math.random() * 360
+              }}
+              animate={{
+                y: windowSize.height + 50,
+                rotate: Math.random() * 720,
+                x: Math.random() * 200 - 100
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                ease: "easeOut"
+              }}
             >
-              <Heart className="w-20 h-20 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">I Love You! 💝</h3>
-              <p className="text-lg">Piagam kenangan kita berhasil disimpan!</p>
+              {i % 5 === 0 ? '💖' : 
+               i % 5 === 1 ? '🎓' : 
+               i % 5 === 2 ? '🌟' : 
+               i % 5 === 3 ? 'H' : 
+               'J'}
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          ))}
+        </div>
+      )}
 
       {/* Certificate Modal */}
       <AnimatePresence>
@@ -491,235 +499,114 @@ const LuxuryGraduationPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
-            onClick={closeCertificateModal}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setShowCertificateModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
               transition={{ type: "spring", damping: 25 }}
-              className={`relative max-w-6xl w-full max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl ${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              }`}
+              className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto`}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className={`relative p-6 border-b ${
-                isDarkMode 
-                  ? 'bg-gradient-to-r from-purple-900 to-pink-800 border-purple-700' 
-                  : 'bg-gradient-to-r from-pink-500 to-purple-500 border-pink-200'
-              }`}>
-                <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold text-white">Piagam Kebanggaan & Cinta</h2>
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={closeCertificateModal}
-                    className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+              <div className={`sticky top-0 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} z-10 p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'} flex justify-between items-center`}>
+                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Piagam Kebanggaan 💝</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={zoomOut}
+                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
                   >
-                    <X className="text-white" size={24} />
-                  </motion.button>
+                    <ZoomOut size={20} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
+                  </button>
+                  <button
+                    onClick={zoomIn}
+                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+                  >
+                    <ZoomIn size={20} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
+                  </button>
+                  <button
+                    onClick={() => setShowCertificateModal(false)}
+                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+                  >
+                    <X size={24} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
+                  </button>
                 </div>
               </div>
-
-              {/* Content */}
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Certificate Image */}
-                  <div className="relative">
-                    <div 
-                      className={`rounded-2xl overflow-hidden shadow-xl border-4 ${
-                        isDarkMode ? 'border-purple-600' : 'border-white'
-                      }`}
-                      ref={certificateRef}
-                      onDragOver={handleDragOver}
-                      onDrop={handleDrop}
-                    >
-                      <motion.img 
-                        src={steps[1].image} 
-                        alt="Piagam Kebanggaan"
-                        className="w-full h-auto transition-transform duration-300"
-                        style={{ scale: zoomLevel }}
-                        draggable={false}
-                      />
-                    </div>
-                    
-                    {/* Zoom Controls */}
-                    <div className="flex justify-center mt-4 gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleZoomOut}
-                        disabled={zoomLevel <= 0.5}
-                        className={`p-2 rounded-full ${
-                          isDarkMode 
-                            ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        } ${zoomLevel <= 0.5 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <ZoomOut size={20} />
-                      </motion.button>
-                      <span className={`px-3 py-2 rounded-lg ${
-                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-                      }`}>
-                        {Math.round(zoomLevel * 100)}%
-                      </span>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleZoomIn}
-                        disabled={zoomLevel >= 3}
-                        className={`p-2 rounded-full ${
-                          isDarkMode 
-                            ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        } ${zoomLevel >= 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <ZoomIn size={20} />
-                      </motion.button>
-                    </div>
-
-                    {/* Interactive Emoji */}
-                    <div className="mt-6 text-center">
-                      <p className={`mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Drag emoji ini ke piagram untuk reveal pesan rahasia!
-                      </p>
-                      <motion.div
-                        ref={emojiRef}
-                        draggable
-                        onDragStart={handleDragStart}
-                        whileHover={{ scale: 1.2, rotate: 15 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="text-4xl cursor-grab active:cursor-grabbing inline-block"
-                      >
-                        💝
-                      </motion.div>
-                    </div>
-
-                    {/* Hidden Message */}
-                    <AnimatePresence>
-                      {showHiddenMessage && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 20 }}
-                          className={`mt-4 p-4 rounded-xl text-center ${
-                            isDarkMode ? 'bg-purple-900/50' : 'bg-pink-100'
-                          }`}
-                        >
-                          <p className={`font-semibold ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>
-                            💌 Pesan Rahasia: Aku akan selalu mencintaimu, Haejay! Kamu adalah segalanya bagiku! 💖
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+              
+              <div className="p-6">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl mb-6" style={{ transform: `scale(${imageZoom})`, transformOrigin: 'center' }}>
+                  <img 
+                    src={piagam} 
+                    alt="Piagam Kebanggaan"
+                    className="w-full h-auto"
+                  />
+                </div>
+                
+                <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-xl p-4 mb-6`}>
+                  <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>Informasi Piagam</h3>
+                  <div className="space-y-2">
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Dari:</span> {steps[1].certificateInfo.from}</p>
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Untuk:</span> {steps[1].certificateInfo.to}</p>
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Tanggal:</span> {steps[1].certificateInfo.date}</p>
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Pesan:</span> {steps[1].certificateInfo.message}</p>
                   </div>
-
-                  {/* Certificate Details */}
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
-                        Detail Piagam
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex justify-between border-b pb-2">
-                          <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Dari:</span>
-                          <span className="font-semibold">{steps[1].certificateDetails.from}</span>
-                        </div>
-                        <div className="flex justify-between border-b pb-2">
-                          <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Untuk:</span>
-                          <span className="font-semibold">{steps[1].certificateDetails.to}</span>
-                        </div>
-                        <div className="flex justify-between border-b pb-2">
-                          <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Tanggal:</span>
-                          <span className="font-semibold">{steps[1].certificateDetails.date}</span>
-                        </div>
+                </div>
+                
+                {/* Countdown Timer */}
+                {showCountdown && (
+                  <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-pink-100'} rounded-xl p-4 mb-6 text-center`}>
+                    <p className={`text-lg ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>Piagam akan tersedia untuk diunduh dalam:</p>
+                    <div className="flex justify-center">
+                      <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-full w-16 h-16 flex items-center justify-center`}>
+                        <span className="text-2xl font-bold text-pink-500">{countdown}</span>
                       </div>
                     </div>
-
-                    <div>
-                      <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
-                        Pesan Personal
-                      </h3>
-                      <div className={`p-4 rounded-xl min-h-[120px] ${
-                        isDarkMode ? 'bg-gray-700/50' : 'bg-pink-50'
-                      }`}>
-                        <p className={`leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                          {typewriterText}
-                          <span className="animate-pulse">|</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Interactive Heart */}
-                    <div className="text-center">
-                      <p className={`mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Klik hati untuk pesan spesial!
-                      </p>
-                      <motion.button
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => setShowHiddenMessage(!showHiddenMessage)}
-                        className="text-4xl text-pink-500 animate-pulse"
-                      >
-                        ❤️
-                      </motion.button>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                      <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          downloadCertificate();
-                          setShowDownloadSuccess(true);
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg"
-                      >
-                        <Download size={20} />
-                        Unduh Piagam
-                      </motion.button>
-                      
-                      <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => shareMessage('whatsapp')}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-all duration-300 shadow-lg"
-                      >
-                        <MessageSquare size={20} />
-                        Share WA
-                      </motion.button>
-                    </div>
-
-                    {/* Additional Share Options */}
-                    <div className="flex justify-center gap-3">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => shareMessage('facebook')}
-                        className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-                      >
-                        <Share2 size={18} />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => shareMessage('twitter')}
-                        className="p-3 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition-colors"
-                      >
-                        <MessageCircle size={18} />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => shareMessage('email')}
-                        className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                      >
-                        <Mail size={18} />
-                      </motion.button>
-                    </div>
+                  </div>
+                )}
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={downloadCertificate}
+                    disabled={showCountdown}
+                    className={`flex items-center justify-center gap-3 px-8 py-4 ${showCountdown ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-purple-600'} text-white rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg`}
+                  >
+                    <Download size={20} />
+                    {showCountdown ? 'Tunggu...' : 'Unduh Piagam'}
+                  </motion.button>
+                  
+                  <div className="flex gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={shareMessage}
+                      className="flex items-center justify-center gap-3 px-6 py-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-all duration-300 shadow-lg"
+                    >
+                      <Share2 size={20} />
+                      WA
+                    </motion.button>
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={shareToEmail}
+                      className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500 text-white rounded-2xl font-semibold hover:bg-blue-600 transition-all duration-300 shadow-lg"
+                    >
+                      <MessageCircle size={20} />
+                      Email
+                    </motion.button>
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => shareToSocial('facebook')}
+                      className="flex items-center justify-center gap-3 px-6 py-4 bg-indigo-500 text-white rounded-2xl font-semibold hover:bg-indigo-600 transition-all duration-300 shadow-lg"
+                    >
+                      <Share2 size={20} />
+                      FB
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -732,61 +619,27 @@ const LuxuryGraduationPage = () => {
       <AnimatePresence>
         {showDownloadSuccess && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.8 }}
-            className="fixed bottom-6 right-6 z-50"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-4 rounded-full shadow-xl flex items-center gap-3"
           >
-            <div className={`p-4 rounded-2xl shadow-2xl max-w-sm ${
-              isDarkMode 
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' 
-                : 'bg-gradient-to-r from-pink-400 to-purple-500 text-white'
-            }`}>
-              <div className="flex items-center gap-3">
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 10, -10, 0]
-                  }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Heart className="w-6 h-6" />
-                </motion.div>
-                <div>
-                  <p className="font-semibold">✅ Piagam berhasil diunduh!</p>
-                  <p className="text-sm opacity-90">Simpan kenangan manismu 💖</p>
-                </div>
-              </div>
-              
-              {/* Mini Confetti Effect */}
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                {[...Array(10)].map((_, i) => (
-                  <motion.span
-                    key={i}
-                    className="absolute text-white text-xs"
-                    initial={{ 
-                      y: 20, 
-                      x: Math.random() * 100, 
-                      opacity: 0,
-                      scale: 0 
-                    }}
-                    animate={{ 
-                      y: -30, 
-                      x: Math.random() * 100 - 50,
-                      opacity: [0, 1, 0],
-                      scale: [0, 1, 0],
-                      rotate: Math.random() * 360
-                    }}
-                    transition={{ 
-                      duration: 1 + Math.random(),
-                      delay: i * 0.1
-                    }}
-                  >
-                    {i % 3 === 0 ? '💖' : i % 3 === 1 ? '🌟' : '🎉'}
-                  </motion.span>
-                ))}
-              </div>
-            </div>
+            <CheckCircle size={24} />
+            <span className="font-semibold">✅ Piagam berhasil diunduh! Simpan kenangan manismu 💖</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Secret Message Popup */}
+      <AnimatePresence>
+        {showSecretMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-pink-500 to-purple-600 text-white p-6 rounded-2xl shadow-2xl max-w-md"
+          >
+            <p className="text-center">{secretMessage}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -832,7 +685,7 @@ const LuxuryGraduationPage = () => {
                   <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
                     {currentStepData.title}
                   </h1>
-                  <p className="text-2xl text-gray-600 mb-4 max-w-2xl mx-auto leading-relaxed">
+                  <p className={`text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-4 max-w-2xl mx-auto leading-relaxed`}>
                     {currentStepData.message}
                   </p>
                   <p className="text-xl text-pink-500 font-semibold mb-8">
@@ -864,11 +717,7 @@ const LuxuryGraduationPage = () => {
                   className="w-full max-w-4xl"
                 >
                   {/* Main Love Certificate */}
-                  <div className={`rounded-3xl shadow-2xl overflow-hidden border-2 backdrop-blur-sm ${
-                    isDarkMode 
-                      ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-gray-800 border-purple-600' 
-                      : 'bg-gradient-to-br from-white via-pink-50 to-purple-50 border-pink-200'
-                  }`}>
+                  <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-white via-pink-50 to-purple-50'} rounded-3xl shadow-2xl overflow-hidden border-2 ${isDarkMode ? 'border-gray-700' : 'border-pink-200'} backdrop-blur-sm`}>
                     
                     {/* Header dengan tema cinta */}
                     <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white py-12 text-center relative overflow-hidden">
@@ -916,11 +765,9 @@ const LuxuryGraduationPage = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.5 }}
-                          className={`text-lg mb-6 leading-relaxed ${
-                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                          }`}
+                          className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6 leading-relaxed`}
                         >
-                          {currentStepData.personalMessage}
+                          {typewriterText || currentStepData.personalMessage}
                         </motion.p>
                       </div>
 
@@ -931,27 +778,19 @@ const LuxuryGraduationPage = () => {
                         transition={{ delay: 0.7 }}
                         className="relative mb-8"
                       >
-                        <div className={`rounded-2xl overflow-hidden shadow-xl border-4 ${
-                          isDarkMode ? 'border-purple-500' : 'border-white'
-                        }`}>
+                        <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                           <img 
                             src={currentStepData.image} 
                             alt="Piagam Kebanggaan"
-                            className="w-full h-auto cursor-pointer transition-transform duration-300 hover:scale-105"
-                            onClick={openCertificateModal}
+                            className="w-full h-auto"
                           />
                         </div>
-                        
-                        {/* Button to open certificate modal */}
                         <motion.button
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={openCertificateModal}
-                          className="mt-4 w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg flex items-center justify-center gap-3"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          className="absolute -top-3 -right-3 bg-gradient-to-r from-pink-400 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg cursor-pointer"
+                          onClick={revealSecretMessage}
                         >
-                          <Sparkles size={20} />
-                          Lihat Detail Piagram
-                          <Sparkles size={20} />
+                          💝 Klik Aku!
                         </motion.button>
                       </motion.div>
 
@@ -969,13 +808,9 @@ const LuxuryGraduationPage = () => {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 + 1.2 }}
                             whileHover={{ scale: 1.05, y: -2 }}
-                            className={`p-4 rounded-xl shadow-lg border backdrop-blur-sm hover:shadow-xl transition-all duration-300 ${
-                              isDarkMode 
-                                ? 'bg-gray-700/50 border-purple-500/30' 
-                                : 'bg-white/80 border-pink-100'
-                            }`}
+                            className={`p-4 ${isDarkMode ? 'bg-gray-700' : 'bg-white/80'} backdrop-blur-sm rounded-xl shadow-lg border ${isDarkMode ? 'border-gray-600' : 'border-pink-100'} hover:shadow-xl transition-all duration-300`}
                           >
-                            <p className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>{note}</p>
+                            <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>{note}</p>
                           </motion.div>
                         ))}
                       </motion.div>
@@ -985,37 +820,55 @@ const LuxuryGraduationPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.5 }}
-                        className={`text-center border-t pt-6 ${
-                          isDarkMode ? 'border-purple-700' : 'border-pink-200'
-                        }`}
+                        className={`text-center border-t ${isDarkMode ? 'border-gray-700' : 'border-pink-200'} pt-6`}
                       >
-                        <p className={`text-lg mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Dengan penuh cinta dan kebanggaan,
-                        </p>
+                        <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Dengan penuh cinta dan kebanggaan,</p>
                         <p className="text-xl font-bold text-pink-500">Pacarmu yang selalu menyayangimu 💕</p>
-                        <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                          November 2024
-                        </p>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>November 2024</p>
                       </motion.div>
                     </div>
                   </div>
+
+                  {/* Action Buttons */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8"
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={openCertificateModal}
+                      className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <Award size={20} />
+                      Lihat Detail Piagam
+                    </motion.button>
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={shareMessage}
+                      className={`flex items-center gap-3 px-8 py-4 ${isDarkMode ? 'bg-gray-700' : 'bg-white'} border-2 ${isDarkMode ? 'border-gray-600' : 'border-pink-300'} text-pink-500 rounded-2xl font-semibold ${isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-pink-50'} transition-all duration-300 shadow-lg hover:shadow-xl`}
+                    >
+                      <Share2 size={20} />
+                      Bagikan Kebahagiaan
+                    </motion.button>
+                  </motion.div>
 
                   {/* Navigation */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 2.2 }}
-                    className="flex justify-center gap-4 mt-8"
+                    className="flex justify-center gap-4 mt-6"
                   >
                     <motion.button
                       whileHover={{ scale: 1.05, x: -5 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={prevStep}
-                      className={`flex items-center gap-2 px-6 py-3 backdrop-blur-sm border rounded-xl transition-all duration-300 ${
-                        isDarkMode
-                          ? 'bg-gray-700/50 border-gray-600 text-gray-300 hover:border-purple-500'
-                          : 'bg-white/80 border-gray-300 text-gray-700 hover:border-pink-400'
-                      }`}
+                      className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-gray-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-xl ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-pink-400'} transition-all duration-300`}
                     >
                       <ArrowLeft size={18} />
                       Sebelumnya
@@ -1035,8 +888,258 @@ const LuxuryGraduationPage = () => {
               </div>
             )}
 
-            {/* Steps lainnya akan ditambahkan dengan tema yang sama sweet dan personal */}
-            {/* Step 3: Memories, Step 4: Love Letter, Step 5: Future */}
+            {/* Step 3: Memories */}
+            {currentStepData.type === "memories" && (
+              <div className="py-8 min-h-screen flex flex-col justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+                    {currentStepData.title}
+                  </h1>
+                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {currentStepData.message}
+                  </p>
+                </motion.div>
+
+                {/* Image Carousel */}
+                <div className="relative mb-8">
+                  <div className="overflow-hidden rounded-2xl shadow-2xl">
+                    <motion.div
+                      className="flex"
+                      animate={{ x: -currentImageIndex * 100 + "%" }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    >
+                      {currentStepData.images.map((image, index) => (
+                        <div key={index} className="w-full flex-shrink-0">
+                          <img 
+                            src={image.src} 
+                            alt={image.caption}
+                            className="w-full h-auto object-cover"
+                          />
+                          <div className={`p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>{image.caption}</h3>
+                            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>{image.description}</p>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>{image.date}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  </div>
+
+                  {/* Carousel Controls */}
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                  >
+                    <ChevronLeft size={24} className="text-gray-800" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                  >
+                    <ChevronRight size={24} className="text-gray-800" />
+                  </button>
+
+                  {/* Carousel Indicators */}
+                  <div className="flex justify-center mt-4 gap-2">
+                    {currentStepData.images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-3 h-3 rounded-full ${index === currentImageIndex ? 'bg-pink-500' : 'bg-gray-300'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex justify-center gap-4 mt-8"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={prevStep}
+                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-gray-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-xl ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-pink-400'} transition-all duration-300`}
+                  >
+                    <ArrowLeft size={18} />
+                    Sebelumnya
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05, x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={nextStep}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-pink-500 hover:to-purple-500 transition-all duration-300"
+                  >
+                    Lanjut
+                    <ArrowRight size={18} />
+                  </motion.button>
+                </motion.div>
+              </div>
+            )}
+
+            {/* Step 4: Love Letter */}
+            {currentStepData.type === "love_letter" && (
+              <div className="py-8 min-h-screen flex flex-col justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+                    {currentStepData.title}
+                  </h1>
+                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {currentStepData.message}
+                  </p>
+                </motion.div>
+
+                {/* Love Letter Content */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl p-8 mb-8 max-w-3xl mx-auto`}
+                >
+                  <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-pink-50'} rounded-2xl p-6 mb-6`}>
+                    {currentStepData.letter.map((line, index) => (
+                      <motion.p
+                        key={index}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: index * 0.1 + 0.5 }}
+                        className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} ${line === '' ? 'mb-2' : 'mb-1'} ${line.startsWith('-') ? 'ml-6' : ''}`}
+                      >
+                        {line}
+                      </motion.p>
+                    ))}
+                  </div>
+                  
+                  <div className="text-center">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 2, type: "spring" }}
+                      className="inline-block"
+                    >
+                      <Heart className="w-16 h-16 text-pink-500 mx-auto mb-4" />
+                      <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} italic`}>With all my love, always</p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Navigation */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex justify-center gap-4 mt-8"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={prevStep}
+                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-gray-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-xl ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-pink-400'} transition-all duration-300`}
+                  >
+                    <ArrowLeft size={18} />
+                    Sebelumnya
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05, x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={nextStep}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-pink-500 hover:to-purple-500 transition-all duration-300"
+                  >
+                    Lanjut
+                    <ArrowRight size={18} />
+                  </motion.button>
+                </motion.div>
+              </div>
+            )}
+
+            {/* Step 5: Future */}
+            {currentStepData.type === "future" && (
+              <div className="py-8 min-h-screen flex flex-col justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+                    {currentStepData.title}
+                  </h1>
+                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {currentStepData.message}
+                  </p>
+                </motion.div>
+
+                {/* Future Dreams Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  {currentStepData.dreams.map((dream, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.2 + 0.3 }}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300`}
+                    >
+                      <div className="text-5xl mb-4 text-center">{dream.icon}</div>
+                      <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2 text-center`}>{dream.title}</h3>
+                      <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-center`}>{dream.description}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Final Message */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 }}
+                  className={`${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-pink-100 to-purple-100'} rounded-3xl p-8 text-center mb-8`}
+                >
+                  <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Aku tidak sabar untuk memulai babak baru bersamamu!</h2>
+                  <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6`}>Terima kasih sudah menjadi inspirasi dalam hidupku. Aku akan selalu ada untukmu, dalam suka maupun duka.</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowConfetti(true);
+                      setTimeout(() => setShowConfetti(false), 8000);
+                    }}
+                    className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl font-bold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg"
+                  >
+                        Rayakan Bersama! 🎉
+                  </motion.button>
+                </motion.div>
+
+                {/* Navigation */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5 }}
+                  className="flex justify-center"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={prevStep}
+                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-gray-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-xl ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-pink-400'} transition-all duration-300`}
+                  >
+                    <ArrowLeft size={18} />
+                    Kembali
+                  </motion.button>
+                </motion.div>
+              </div>
+            )}
 
           </motion.div>
         </AnimatePresence>
@@ -1090,9 +1193,9 @@ const LuxuryGraduationPage = () => {
               ease: "easeInOut"
             }}
           >
-            {i % 3 === 0 ? <span className={`text-xl ${isDarkMode ? 'text-pink-400' : 'text-pink-300'}`}>💖</span> : 
-             i % 3 === 1 ? <span className={`text-xl ${isDarkMode ? 'text-purple-400' : 'text-purple-300'}`}>🌟</span> : 
-             <span className={`text-xl ${isDarkMode ? 'text-blue-400' : 'text-blue-300'}`}>🎓</span>}
+            {i % 3 === 0 ? <span className={`${isDarkMode ? 'text-pink-400' : 'text-pink-300'} text-xl`}>💖</span> : 
+             i % 3 === 1 ? <span className={`${isDarkMode ? 'text-purple-400' : 'text-purple-300'} text-xl`}>🌟</span> : 
+             <span className={`${isDarkMode ? 'text-blue-400' : 'text-blue-300'} text-xl`}>🎓</span>}
           </motion.div>
         ))}
       </div>
