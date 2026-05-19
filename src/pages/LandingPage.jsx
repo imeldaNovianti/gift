@@ -1,72 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { motion, AnimatePresence, useAnimation, useScroll, useTransform } from "framer-motion";
 import Confetti from "react-confetti";
 import { 
-  Heart, 
-  Download, 
-  Share2, 
-  Star, 
-  Trophy, 
-  Award, 
-  Camera,
-  Music,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Sparkles,
-  Gem,
-  Crown,
-  Zap,
-  BookOpen,
-  GraduationCap,
-  Users,
-  Clock,
-  MapPin,
-  ArrowLeft,
-  ArrowRight,
-  Medal,
-  Ribbon,
-  MessageCircle,
-  Gift,
-  X,
-  CheckCircle,
-  ZoomIn,
-  ZoomOut,
-  Sun,
-  Moon,
-  Maximize2,
-  Minimize2,
-  ChevronLeft,
-  ChevronRight
+  Heart, Download, Share2, Star, Sparkles, Music, Play, Pause, Volume2, VolumeX,
+  Gift, X, CheckCircle, ZoomIn, ZoomOut, Sun, Moon, ChevronLeft, ChevronRight,
+  Cake, PartyPopper, Mail, Send, Camera, Calendar, MapPin
 } from "lucide-react";
-
-// Import semua foto
-import pasfoto from '../assets/pasfoto.jpg';
+import pasfoto from '../assets/pasfoto.jpeg';
 import piagam from '../assets/piagam.jpg';
-import fs1 from '../assets/fs1.jpg';
-import fs2 from '../assets/fs2.jpg';
-import fs3 from '../assets/fs3.jpg';
-import fs4 from '../assets/fs4.jpg';
-import jay1 from '../assets/jay1.jpg';
-import jaypp1 from '../assets/jaypp1.jpg';
-import jaywisuda2 from '../assets/jaywisuda2.jpg';
-import backgroundMusic from '../assets/music/Laskar Pelangi - Nidji.mp3';
-
-// Import Google Fonts
+import firstmeet from '../assets/firstmeet.jpeg';
+import fs1 from '../assets/fs1.jpeg';
+import fs2 from '../assets/fs2.jpeg';
+import kaputra1 from '../assets/kaputra1.jpeg';
+import kaputra2 from '../assets/kaputra2.jpeg';
+import kaputra3 from '../assets/kaputra3.jpeg';
+import kaputra4 from '../assets/kaputra4.jpeg';
+import kaputra5 from '../assets/kaputra5.jpeg';
+import kaputra6 from '../assets/kaputra6.jpeg';
+import kaputra7 from '../assets/kaputra7.jpeg';
+import kaputra8 from '../assets/kaputra8.jpeg';
+import kaputra9 from '../assets/kaputra9.jpeg';
+import backgroundMusic from '../assets/music/nadin-ah.mp4';
 const loadGoogleFonts = () => {
   const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@500;600&display=swap';
   link.rel = 'stylesheet';
   document.head.appendChild(link);
 };
 
-const LuxuryGraduationPage = () => {
+const LuxuryBirthdayPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
-  const [showSurprise, setShowSurprise] = useState(false);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [showDownloadSuccess, setShowDownloadSuccess] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -78,265 +44,77 @@ const LuxuryGraduationPage = () => {
   const [showCountdown, setShowCountdown] = useState(false);
   const [secretMessage, setSecretMessage] = useState('');
   const [showSecretMessage, setShowSecretMessage] = useState(false);
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [loadedImages, setLoadedImages] = useState({});
 
   const audioRef = useRef(null);
   const cheerSoundRef = useRef(null);
-  const controls = useAnimation();
+  const containerRef = useRef(null);
 
-  // Load Google Fonts on component mount
+  useEffect(() => { loadGoogleFonts(); }, []);
   useEffect(() => {
-    loadGoogleFonts();
+    const images = [pasfoto, piagam, firstmeet, fs1, fs2, kaputra1, kaputra2, kaputra3, kaputra4, kaputra5, kaputra6, kaputra7, kaputra8, kaputra9];
+    images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => setLoadedImages(prev => ({ ...prev, [src]: true }));
+    });
   }, []);
-
-  // Data untuk setiap step - DIUBAH MENJADI LEBIH PERSONAL DAN SWEET
-  const steps = [
-    {
-      type: "opening",
-      title: "Haejy S A.md,kep!",
-      message: "Selamat yaa! Akhirnya berhasil menyelesaikan perjalanan awal ini...",
-      image: pasfoto,
-      buttonText: "OPEN THIS SURPRISE",
-      personalMessage: "IM PROUD OF U",
-      music: "romantic"
-    },
-    {
-      type: "certificate",
-      title: "Surat & Kebanggaan",
-      message: "From your lover who always supports you.",
-      image: piagam,
-      personalMessage: "Setiap tetes keringat dan usahamu akhirnya terbayar sudah. Kamu hebat!",
-      loveNotes: [
-"I’m always proud of your hard work",
-"From studying late at night to giving presentations",
-"You always give your very best",
-"Your dream has now become reality",
-"You are the star in my life"
-      ],
-      music: "proud",
-      certificateInfo: {
-        from: "💖 From your partner who always believes in you and stands by you.",
-        to: "Haejay Bau Kucaay",
-        date: "November 2024",
-        message: "Untuk cintaku yang telah berhasil menyelesaikan studi dengan gemilang. Semoga prestasi ini menjadi awal dari kesuksesanmu yang lebih besar. Aku selalu bangga padamu!"
-      }
-    },
-    {
-      type: "memories",
-      title: "OUR GALLERY",
-      message: "Momen-momen berharga",
-      images: [
-        { 
-          src: fs1, 
-          caption: "Dukungan di Setiap Langkah", 
-          description: "I’m always by your side, through the joys and struggles of college"
-,
-          date: "2023"
-        },
-        { 
-          src: fs2, 
-          caption: "Celebrations Together", 
-          description: "Merayakan setiap pencapaian kecil dan besar",
-          date: "2023"
-        },
-        { 
-          src: fs3, 
-          caption: "Moments of Joy", 
-          description: "semoga berbahagia selalu",
-          date: "2024"
-        },
-        { 
-          src: fs4, 
-          caption: "Future Dreams", 
-          description: "Together, we will create even more beautiful memories"
-,
-          date: "Sekarang"
-        },
-        { 
-          src: jay1, 
-          caption: "Sweet Moments", 
-          description:"Every second with you is an unforgettable memory"
-,
-          date: "2023"
-        },
-        { 
-          src: jaypp1, 
-          caption: "Our Journey", 
-          description: "Our journey is filled with love and laughter"
-,
-          date: "2024"
-        },
-        { 
-          src: jaywisuda2, 
-          caption: "Graduation Day", 
-          description: "Hari dimana semua kerja kerasmu terbayarkan",
-          date: "November 2024"
-        }
-      ],
-      music: "nostalgic"
-    },
-    {
-      type: "love_letter",
-      title: "Surat Cinta Untukmu",
-      message: "Dari hatiku yang paling dalam...",
-      letter: [
-"My Dearest Haejay,",
-"",
-"Today is such a special day...",
-"Seeing you successfully complete your studies makes my heart bloom with joy.",
-"I still vividly remember all your struggles:",
-"- The stress of facing countless exams",
-"- Your unyielding spirit even when you were tired",
-"",
-"But look at you now...",
-"All that hard work has finally paid off!",
-"You didn’t just graduate, you graduated with pride.",
-"",
-"I’m so proud of you, more than words can express.",
-"You are an inspiration to me and to many others.",
-"",
-"This is not the end, but a beautiful beginning...",
-"I can’t wait to see all your dreams come true.",
-"And I promise I’ll always be by your side,",
-"supporting every step and celebrating every success.",
-"",
-"Congratulations, my love!",
-"The world is yours to conquer!",
-"",
-"Forever proud of you,",
-"Your girlfriend who will always love you"
-      ],
-      music: "intimate"
-    },
-    {
-      type: "future",
-      title: "Masa Depan Kita",
-      message: "semoga selalu dilindungi yaa!",
-      dreams: [
-        {
-          icon: "🏠",
-          title: "Rumah Impian",
-          description: "Membangun keluarga yang penuh cinta dan kebahagiaan,ehehehhe"
-        },
-        {
-          icon: "✈️",
-          title: "Petualangan Bersama", 
-          description: "Menjelajahi dunia dan membuat kenangan tak terlupakan,aminin yaa"
-        },
-        {
-          icon: "💼",
-          title: "Karier Gemilang",
-          description: "Mendukung karirmu yang cemerlang dan penuh prestasi,selalu jadi doa"
-        },
-        {
-          icon: "❤️",
-          title: "love",
-          description: "Tetap saling mencintai dan mendukung selamanya yaa,jangan bosen yakinin aku na nyaa"
-        }
-      ],
-      music: "optimistic"
-    }
-  ];
-
-  // Background music dengan file lokal
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.play().catch(console.log);
+      audioRef.current.volume = 0.4;
+      audioRef.current.play().catch(() => {});
     }
   }, []);
-
-  // Typewriter effect
   useEffect(() => {
     if (currentStep === 1) {
       const text = steps[1].personalMessage;
       let index = 0;
       setTypewriterText('');
-      
       const interval = setInterval(() => {
         if (index < text.length) {
           setTypewriterText(prev => prev + text[index]);
           index++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 50);
-      
+        } else { clearInterval(interval); }
+      }, 70);
       return () => clearInterval(interval);
     }
   }, [currentStep]);
-
-  // Countdown effect
   useEffect(() => {
     if (showCountdown && countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (countdown === 0 && showCountdown) {
       setShowCountdown(false);
       setCountdown(10);
-      // Trigger confetti when countdown reaches 0
       setShowPersonalizedConfetti(true);
       setTimeout(() => setShowPersonalizedConfetti(false), 5000);
     }
   }, [countdown, showCountdown]);
-
   useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
+    const handleResize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   const toggleMusic = () => {
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
+      isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
       setIsPlaying(!isPlaying);
     }
   };
-
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const nextStep = () => {
-    if (currentStep === steps.length - 1) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 8000);
-    } else {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
-  };
+  const toggleMute = () => { if (audioRef.current) { audioRef.current.muted = !isMuted; setIsMuted(!isMuted); } };
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const nextStep = () => { if (currentStep === steps.length - 1) { setShowConfetti(true); setTimeout(() => setShowConfetti(false), 8000); } else { setCurrentStep(p => p + 1); } };
+  const prevStep = () => setCurrentStep(p => Math.max(0, p - 1));
+  const zoomIn = () => setImageZoom(p => Math.min(p + 0.2, 3));
+  const zoomOut = () => setImageZoom(p => Math.max(p - 0.2, 1));
+  const nextImage = () => setCurrentImageIndex(p => (p + 1) % steps[2].images.length);
+  const prevImage = () => setCurrentImageIndex(p => (p - 1 + steps[2].images.length) % steps[2].images.length);
 
   const openCertificateModal = () => {
     setShowCertificateModal(true);
-    // Play cheer sound
-    if (cheerSoundRef.current) {
-      cheerSoundRef.current.play().catch(console.log);
-    }
-    // Start countdown
+    if (cheerSoundRef.current) cheerSoundRef.current.play().catch(() => {});
     setShowCountdown(true);
-    // Show personalized confetti
     setShowPersonalizedConfetti(true);
     setTimeout(() => setShowPersonalizedConfetti(false), 5000);
   };
@@ -344,340 +122,357 @@ const LuxuryGraduationPage = () => {
   const downloadCertificate = () => {
     const link = document.createElement('a');
     link.href = piagam;
-    link.download = 'Piagam-Kebanggaan-Haejay.jpg';
+    link.download = 'Birthday-Wish-kaputra.jpg';
     link.click();
-    
-    // Show success notification
     setShowCertificateModal(false);
     setShowDownloadSuccess(true);
     setTimeout(() => setShowDownloadSuccess(false), 3000);
   };
 
   const shareMessage = () => {
-    const text = "Lihat kejutan spesial dari pacar untuk Haejay yang baru lulus! Ayo beri selamat untuknya!";
+    const text = "🎂 A little birthday surprise for someone special. Check it out!";
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
-
   const shareToEmail = () => {
-    const subject = "Selamat Wisuda, Haejay!";
-    const body = "Hai, aku ingin berbagi kebahagiaan. Lihat kejutan spesial yang aku buat untuk Haejay yang baru lulus!";
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:?subject=🎉 Happy Birthday!&body=Just wanted to share something sweet with you.`;
   };
-
   const shareToSocial = (platform) => {
     const url = window.location.href;
-    const text = "Lihat kejutan spesial dari pacar untuk Haejay yang baru lulus!";
-    
-    if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-    } else if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-    }
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  const zoomIn = () => {
-    setImageZoom(prev => Math.min(prev + 0.2, 3));
-  };
-
-  const zoomOut = () => {
-    setImageZoom(prev => Math.max(prev - 0.2, 1));
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % steps[2].images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + steps[2].images.length) % steps[2].images.length);
+    if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    else if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`, '_blank');
   };
 
   const revealSecretMessage = () => {
-    setSecretMessage("Aku akan selalu mencintaimu, tidak peduli seberapa sulit jalan yang kita lalui. Bersama kita bisa melewati apa pun!");
+    setSecretMessage("Just wanted you to know – you make ordinary days feel special. Happy Birthday. 💙");
     setShowSecretMessage(true);
     setTimeout(() => setShowSecretMessage(false), 5000);
   };
 
+  const steps = [
+    {
+      type: "opening",
+      title: "Hey, it's your day KAAA 🎂",
+      message: "Today is all about you. I made something small, just to say I'm glad you're here.",
+      image: pasfoto,
+      buttonText: "Open this for me",
+      personalMessage: "Really happy you were born.",
+      music: "soft"
+    },
+    {
+      type: "birthday_wish",
+      title: "A note for you",
+      message: "Nothing fancy. Just words from the heart.",
+      image: piagam,
+      personalMessage: "Being around you makes things feel a little lighter.",
+      loveNotes: [
+        "You have a way of making people feel seen.",
+        "Your laugh is genuinely contagious.",
+        "You show up, even when it's hard.",
+        "The world is better with you in it.",
+        "Here's to more quiet moments and loud laughs."
+      ],
+      music: "warm",
+      certificateInfo: {
+        from: "From someone who appreciates you.",
+        to: "Ka Putra",
+        date: "Your special day",
+        message: "Wishing you a year that feels as good as you make others feel. No grand promises – just genuine hope for your happiness."
+      }
+    },
+    {
+      type: "memories",
+      title: "Moments we've had",
+      message: "Some snapshots from the story so far.",
+      images: [
+        { src: firstmeet, caption: "When we first met", description: "Didn't know then what I know now.", date: "2023" },
+        { src: fs1, caption: "Coffee & conversations", description: "The simple talks that meant everything.", date: "2023" },
+        { src: fs2, caption: "Just being", description: "No agenda. Just us.", date: "2024" },
+        { src: kaputra1, caption: "Little adventures", description: "Getting lost together.", date: "Now" },
+        { src: kaputra2, caption: "Quiet Sundays", description: "The calm in between.", date: "2023" },
+        { src: kaputra3, caption: "You, being you", description: "That's the best part.", date: "2024" },
+        { src: kaputra4, caption: "Today", description: "And here we are.", date: "🎂" }
+      ],
+      music: "nostalgic"
+    },
+    {
+      type: "love_letter",
+      title: "What I wanted to say",
+      message: "In case I don't say it enough.",
+      letter: [
+"Heyyooow sayangkuuu ,",
+"",
+"Today's your day ya kaa. So I'll keep this simple mwehehehe.",
+"",
+"I notice things about ka putra, alweeyyyss yaa.",
+"Like how ka putra listen – really listen.",
+"Or how ka putra find humor in the small stuff.",
+"",
+"Ka putra, don't always see what I see.",
+"But I see it.",
+"",
+"Your kindness isn't performative.",
+"Your strength isn't loud.",
+"Your presence just... fits.",
+"",
+"I'm not great with big speeches.",
+"So here's the short version:",
+"",
+"I'm glad you exist.",
+"I'm glad I know you.",
+"I'm glad today is yours.",
+"",
+"Happy Birthday yaa kaa.",
+"However you spend it,",
+"I hope it feels good.",
+"",
+"– Me"
+      ],
+      music: "intimate"
+    },
+    {
+      type: "future",
+      title: "What's next",
+      message: "No predictions. Just hopes.",
+      dreams: [
+        { icon: "☕", title: "More mornings", description: "Coffee, silence, and the comfort of routine." },
+        { icon: "🗺️", title: "New places", description: "Getting lost somewhere unfamiliar, together." },
+        { icon: "🌱", title: "Growing", description: "Becoming versions of ourselves we like more." },
+        { icon: "💙", title: "This", description: "Whatever this is. Keeping it real." }
+      ],
+      music: "hopeful"
+    }
+  ];
+
   const currentStepData = steps[Math.min(currentStep, steps.length - 1)];
 
+  const theme = {
+    light: {
+      bg: 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-sky-50',
+      card: 'bg-white/80',
+      cardBorder: 'border-blue-100',
+      text: 'text-slate-800',
+      textMuted: 'text-slate-600',
+      textLight: 'text-slate-500',
+      accent: 'text-blue-600',
+      gradient: 'from-blue-500 via-sky-400 to-cyan-400',
+      gradientHover: 'from-sky-500 to-blue-500',
+      floating: 'bg-blue-200/30',
+      sparkles: 'text-sky-300/50'
+    },
+    dark: {
+      bg: 'bg-gradient-to-br from-slate-900 via-blue-950/50 to-slate-900',
+      card: 'bg-slate-800/80',
+      cardBorder: 'border-blue-900/50',
+      text: 'text-slate-100',
+      textMuted: 'text-slate-400',
+      textLight: 'text-slate-500',
+      accent: 'text-sky-300',
+      gradient: 'from-blue-600 via-sky-500 to-cyan-500',
+      gradientHover: 'from-sky-600 to-blue-600',
+      floating: 'bg-blue-500/20',
+      sparkles: 'text-sky-400/30'
+    }
+  };
+  const t = isDarkMode ? theme.dark : theme.light;
+  const fadeInUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } };
+  const fadeInLeft = { hidden: { opacity: 0, x: -40 }, visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } } };
+  const fadeInRight = { hidden: { opacity: 0, x: 40 }, visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } } };
+  const scaleIn = { hidden: { opacity: 0, scale: 0.92 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, type: "spring", damping: 20 } } };
+  const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
+  const floatSlow = { y: [0, -8, 0], transition: { duration: 4, repeat: Infinity, ease: "easeInOut" } };
+  const pulseSoft = { scale: [1, 1.03, 1], transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" } };
+  const floatingElements = Array.from({ length: 18 }, (_, i) => ({
+    id: i,
+    emoji: ['·', '⁺', '✦', '•', '⋆', '˚'][i % 6],
+    size: Math.random() * 8 + 6,
+    left: Math.random() * 100,
+    delay: Math.random() * 5,
+    duration: Math.random() * 15 + 20,
+    opacity: Math.random() * 0.4 + 0.2
+  }));
+
   return (
-    <div className={`min-h-screen font-sans relative overflow-hidden transition-all duration-500 ${
-      isDarkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900' 
-        : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'
-    }`}>
-      {/* Background Music */}
-      <audio
-        ref={audioRef}
-        src={backgroundMusic}
-        loop
-        autoPlay
-      />
-      
-      {/* Cheer Sound Effect */}
-      <audio
-        ref={cheerSoundRef}
-        src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
-      />
-      
-      {/* Animated Background - Geometric Shapes */}
+    <div ref={containerRef} className={`min-h-screen font-sans relative overflow-hidden transition-colors duration-700 ${t.bg}`}>
+      <audio ref={audioRef} src={backgroundMusic} loop autoPlay playsInline muted={isMuted} />
+      <audio ref={cheerSoundRef} src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" />
+
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Floating Bubbles */}
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={`bubble-${i}`}
-            className="absolute rounded-full"
-            style={{
-              width: Math.random() * 100 + 20,
-              height: Math.random() * 100 + 20,
-              left: `${Math.random() * 100}%`,
-              bottom: -150,
-              background: isDarkMode 
-                ? `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 100}, ${Math.random() * 100 + 200}, ${Math.random() * 0.15 + 0.05})`
-                : `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 100}, ${Math.random() * 100 + 200}, ${Math.random() * 0.1 + 0.05})`,
-            }}
-            animate={{
-              y: [windowSize.height + 200, -200],
-              x: [0, Math.random() * 200 - 100],
-              opacity: [0, 0.7, 0],
-            }}
-            transition={{
-              duration: Math.random() * 20 + 15,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-        
-        {/* Floating Geometric Shapes */}
-        {[...Array(10)].map((_, i) => (
-          <motion.div
-            key={`shape-${i}`}
+        {floatingElements.map(el => (
+          <motion.div key={el.id}
             className="absolute"
-            style={{
-              width: Math.random() * 60 + 20,
-              height: Math.random() * 60 + 20,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `rotate(${Math.random() * 360}deg)`,
-              background: isDarkMode 
-                ? `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 100}, ${Math.random() * 100 + 200}, ${Math.random() * 0.1 + 0.05})`
-                : `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 100}, ${Math.random() * 100 + 200}, ${Math.random() * 0.1 + 0.05})`,
-              borderRadius: i % 3 === 0 ? '50%' : i % 3 === 1 ? '10%' : '0%',
+            style={{ 
+              left: `${el.left}%`, 
+              bottom: -20,
+              fontSize: el.size,
+              color: isDarkMode ? '#94a3b8' : '#64748b',
+              opacity: el.opacity
             }}
             animate={{
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.3, 0.1],
+              y: [windowSize.height + 30, -30],
+              x: [0, Math.sin(el.id) * 30, 0],
+              opacity: [el.opacity, el.opacity + 0.2, el.opacity]
             }}
             transition={{
-              duration: Math.random() * 20 + 10,
+              duration: el.duration,
               repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "easeInOut"
+              delay: el.delay,
+              ease: "linear"
+            }}
+          >
+            {el.emoji}
+          </motion.div>
+        ))}
+
+        {[...Array(4)].map((_, i) => (
+          <motion.div key={`glow-${i}`}
+            className="absolute rounded-full blur-3xl"
+            style={{
+              width: Math.random() * 300 + 150,
+              height: Math.random() * 300 + 150,
+              left: `${i * 25 + Math.random() * 10}%`,
+              top: `${Math.random() * 60 + 10}%`,
+              background: `radial-gradient(circle, ${isDarkMode ? 'rgba(59,130,246,0.15)' : 'rgba(96,165,250,0.1)'}, transparent 70%)`
+            }}
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.4, 0.7, 0.4]
+            }}
+            transition={{
+              duration: 6 + i * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.5
             }}
           />
         ))}
-      </div>
 
-      {/* Music Controls */}
-      <div className="fixed top-6 right-6 z-50 flex gap-3">
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={toggleTheme}
-          className={`p-3 ${isDarkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${isDarkMode ? 'border-slate-700' : 'border-indigo-200'}`}
-        >
-          {isDarkMode ? 
-            <Sun size={22} className="text-yellow-400" /> : 
-            <Moon size={22} className="text-indigo-600" />
-          }
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={toggleMusic}
-          className={`p-3 ${isDarkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${isDarkMode ? 'border-slate-700' : 'border-indigo-200'}`}
-        >
-          {isPlaying ? 
-            <Pause size={22} className={isDarkMode ? "text-pink-400" : "text-indigo-600"} /> : 
-            <Play size={22} className={isDarkMode ? "text-pink-400" : "text-indigo-600"} />
-          }
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: -5 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={toggleMute}
-          className={`p-3 ${isDarkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 border ${isDarkMode ? 'border-slate-700' : 'border-indigo-200'}`}
-        >
-          {isMuted ? 
-            <VolumeX size={22} className={isDarkMode ? "text-pink-400" : "text-indigo-600"} /> : 
-            <Volume2 size={22} className={isDarkMode ? "text-pink-400" : "text-indigo-600"} />
-          }
-        </motion.button>
-      </div>
-
-      {/* Confetti */}
-      {showConfetti && (
-        <Confetti 
-          width={windowSize.width}
-          height={windowSize.height}
-          numberOfPieces={400}
-          colors={['#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']}
+        {/* Gentle wave at bottom */}
+        <motion.div 
+          className="absolute bottom-0 left-0 right-0 h-24"
+          style={{
+            background: `linear-gradient(to top, ${isDarkMode ? 'rgba(30,58,138,0.3)' : 'rgba(147,197,253,0.2)'}, transparent)`
+          }}
+          animate={{ opacity: [0.6, 0.9, 0.6] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
+      </div>
+
+      {/* 🎵 Minimal Music Controls */}
+      <div className="fixed top-5 right-5 z-50 flex gap-2">
+        {[
+          { onClick: toggleTheme, icon: isDarkMode ? Sun : Moon, label: "Theme" },
+          { onClick: toggleMusic, icon: isPlaying ? Pause : Play, label: isPlaying ? "Pause" : "Play" },
+          { onClick: toggleMute, icon: isMuted ? VolumeX : Volume2, label: isMuted ? "Unmute" : "Mute" }
+        ].map((btn, i) => (
+          <motion.button key={i}
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.96 }}
+            onClick={btn.onClick} title={btn.label}
+            className={`p-2.5 rounded-full backdrop-blur-md shadow-lg transition-all duration-300 ${
+              isDarkMode ? 'bg-slate-800/70 hover:bg-slate-700/80 border border-slate-700' : 'bg-white/70 hover:bg-white/90 border border-blue-100'
+            }`}
+          >
+            <btn.icon size={18} className={isDarkMode ? 'text-slate-300' : 'text-slate-600'} />
+          </motion.button>
+        ))}
+      </div>
+
+      {/* 🎊 Confetti */}
+      {showConfetti && (
+        <Confetti width={windowSize.width} height={windowSize.height} numberOfPieces={400}
+          colors={['#60a5fa', '#38bdf8', '#0ea5e9', '#0284c7', '#f0f9ff']} 
+          gravity={0.08} wind={0.02} recycle={false} />
       )}
 
-      {/* Personalized Confetti */}
+      {/* ✨ Subtle Personalized Confetti */}
       {showPersonalizedConfetti && (
         <div className="fixed inset-0 pointer-events-none z-40">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-2xl"
-              initial={{ 
-                x: Math.random() * windowSize.width,
-                y: -50,
+          {[...Array(40)].map((_, i) => (
+            <motion.div key={i} className="absolute text-lg"
+              initial={{ x: Math.random() * windowSize.width, y: -30, opacity: 0, scale: 0.6 }}
+              animate={{
+                y: windowSize.height + 30,
+                x: Math.random() * 200 - 100,
+                opacity: [0, 1, 1, 0],
+                scale: [0.6, 1, 1, 0.8],
                 rotate: Math.random() * 360
               }}
-              animate={{
-                y: windowSize.height + 50,
-                rotate: Math.random() * 720,
-                x: Math.random() * 200 - 100
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                ease: "easeOut"
-              }}
+              transition={{ duration: 4 + Math.random() * 2, ease: "easeOut", delay: Math.random() * 0.8 }}
             >
-              {i % 5 === 0 ? '💖' : 
-               i % 5 === 1 ? '🎓' : 
-               i % 5 === 2 ? '🌟' : 
-               i % 5 === 3 ? 'H' : 
-               'J'}
+              {['💙', '✨', '·', '✦'][i % 4]}
             </motion.div>
           ))}
         </div>
       )}
 
-      {/* Certificate Modal */}
+      {/* 🎁 Certificate Modal */}
       <AnimatePresence>
         {showCertificateModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
             onClick={() => setShowCertificateModal(false)}
           >
-            <motion.div
-              initial={{ scale: 0.8, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, y: 50 }}
-              transition={{ type: "spring", damping: 25 }}
-              className={`${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto`}
-              onClick={(e) => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.96, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.96, y: 20, opacity: 0 }}
+              transition={{ type: "spring", damping: 26, stiffness: 180 }}
+              className={`${t.card} rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto border ${t.cardBorder} backdrop-blur-md`}
+              onClick={e => e.stopPropagation()}
             >
-              <div className={`sticky top-0 ${isDarkMode ? 'bg-slate-800' : 'bg-white'} z-10 p-6 border-b ${isDarkMode ? 'border-slate-700' : 'border-gray-100'} flex justify-between items-center`}>
-                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Piagam Kebanggaan</h2>
-                <div className="flex gap-2">
-                  <button
-                    onClick={zoomOut}
-                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'} transition-colors`}
-                  >
-                    <ZoomOut size={20} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
-                  </button>
-                  <button
-                    onClick={zoomIn}
-                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'} transition-colors`}
-                  >
-                    <ZoomIn size={20} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
-                  </button>
-                  <button
-                    onClick={() => setShowCertificateModal(false)}
-                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'} transition-colors`}
-                  >
-                    <X size={24} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
-                  </button>
-                </div>
+              <div className={`sticky top-0 ${t.card} z-10 px-5 py-4 border-b ${t.cardBorder} flex justify-between items-center backdrop-blur-md`}>
+                <h3 className={`font-semibold ${t.text} flex items-center gap-2`}>
+                  <Gift className="w-5 h-5 text-blue-400" /> A little something
+                </h3>
+                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowCertificateModal(false)}
+                  className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-blue-50'} transition-colors`}
+                >
+                  <X size={18} className={isDarkMode ? "text-slate-400" : "text-slate-600"} />
+                </motion.button>
               </div>
               
-              <div className="p-6">
-                <div className="relative rounded-2xl overflow-hidden shadow-xl mb-6" style={{ transform: `scale(${imageZoom})`, transformOrigin: 'center' }}>
-                  <img 
-                    src={piagam} 
-                    alt="Piagam Kebanggaan"
-                    className="w-full h-auto"
-                  />
+              <div className="p-5 space-y-5">
+                {/* Image */}
+                <div className="relative rounded-xl overflow-hidden shadow-lg border-2 border-white" 
+                  style={{ transform: `scale(${imageZoom})`, transformOrigin: 'center', transition: 'transform 0.3s ease' }}>
+                  <img src={piagam} alt="Birthday wish" className="w-full h-auto" />
                 </div>
                 
-                <div className={`${isDarkMode ? 'bg-slate-700' : 'bg-gray-100'} rounded-xl p-4 mb-6`}>
-                  <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>Informasi Piagam</h3>
-                  <div className="space-y-2">
-                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Dari:</span> {steps[1].certificateInfo.from}</p>
-                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Untuk:</span> {steps[1].certificateInfo.to}</p>
-                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Tanggal:</span> {steps[1].certificateInfo.date}</p>
-                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}><span className="font-semibold">Pesan:</span> {steps[1].certificateInfo.message}</p>
-                  </div>
+                {/* Info */}
+                <div className={`${isDarkMode ? 'bg-slate-700/50' : 'bg-blue-50/60'} rounded-lg p-4 space-y-2`}>
+                  <p className={t.textMuted}><span className="font-medium text-blue-400">From:</span> {steps[1].certificateInfo.from}</p>
+                  <p className={t.textMuted}><span className="font-medium text-blue-400">To:</span> {steps[1].certificateInfo.to}</p>
+                  <p className={t.textMuted}><span className="font-medium text-blue-400">Date:</span> {steps[1].certificateInfo.date}</p>
                 </div>
                 
-                {/* Countdown Timer */}
+                {/* Countdown */}
                 {showCountdown && (
-                  <div className={`${isDarkMode ? 'bg-slate-700' : 'bg-pink-100'} rounded-xl p-4 mb-6 text-center`}>
-                    <p className={`text-lg ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>Piagam akan tersedia untuk diunduh dalam:</p>
-                    <div className="flex justify-center">
-                      <div className={`${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded-full w-16 h-16 flex items-center justify-center`}>
-                        <span className="text-2xl font-bold text-pink-500">{countdown}</span>
-                      </div>
-                    </div>
+                  <div className={`${isDarkMode ? 'bg-slate-700/50' : 'bg-blue-100/60'} rounded-lg p-4 text-center`}>
+                    <p className={`text-sm ${t.text} mb-2`}>Available to save in:</p>
+                    <motion.div className={`inline-flex items-center justify-center w-14 h-14 rounded-full ${isDarkMode ? 'bg-slate-800' : 'bg-white'} shadow`}
+                      animate={{ scale: [1, 1.06, 1] }} transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      <span className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent">{countdown}</span>
+                    </motion.div>
                   </div>
                 )}
                 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={downloadCertificate}
-                    disabled={showCountdown}
-                    className={`flex items-center justify-center gap-3 px-8 py-4 ${showCountdown ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-purple-600'} text-white rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg`}
+                {/* Actions */}
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    onClick={downloadCertificate} disabled={showCountdown}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-medium shadow-md transition-all ${
+                      showCountdown ? 'bg-slate-400 cursor-not-allowed' : `bg-gradient-to-r ${t.gradient} hover:${t.gradientHover}`
+                    }`}
                   >
-                    <Download size={20} />
-                    {showCountdown ? 'Tunggu...' : 'Unduh Piagam'}
+                    <Download size={16} /> {showCountdown ? 'Wait...' : 'Save'}
                   </motion.button>
-                  
                   <div className="flex gap-2">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={shareMessage}
-                      className="flex items-center justify-center gap-3 px-6 py-4 bg-green-500 text-white rounded-2xl font-semibold hover:bg-green-600 transition-all duration-300 shadow-lg"
-                    >
-                      <Share2 size={20} />
-                      WA
-                    </motion.button>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={shareToEmail}
-                      className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500 text-white rounded-2xl font-semibold hover:bg-blue-600 transition-all duration-300 shadow-lg"
-                    >
-                      <MessageCircle size={20} />
-                      Email
-                    </motion.button>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => shareToSocial('facebook')}
-                      className="flex items-center justify-center gap-3 px-6 py-4 bg-indigo-500 text-white rounded-2xl font-semibold hover:bg-indigo-600 transition-all duration-300 shadow-lg"
-                    >
-                      <Share2 size={20} />
-                      FB
-                    </motion.button>
+                    {[{ onClick: shareMessage, bg: 'bg-emerald-500', hover: 'hover:bg-emerald-600', icon: Share2 },
+                      { onClick: shareToEmail, bg: 'bg-blue-500', hover: 'hover:bg-blue-600', icon: Mail }].map((btn, i) => (
+                      <motion.button key={i} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                        onClick={btn.onClick} className={`p-2.5 ${btn.bg} ${btn.hover} text-white rounded-full shadow transition-all`}
+                      >
+                        <btn.icon size={16} />
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -686,403 +481,255 @@ const LuxuryGraduationPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Download Success Notification */}
+      {/* ✅ Success Toast */}
       <AnimatePresence>
         {showDownloadSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-4 rounded-full shadow-xl flex items-center gap-3"
+          <motion.div initial={{ opacity: 0, y: -40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -40 }}
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r ${t.gradient} text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-2`}
           >
-            <CheckCircle size={24} />
-            <span className="font-semibold">✅ yeaay Piagam berhasil diunduh! Simpan kenangan manismu</span>
+            <CheckCircle size={18} /> <span className="text-sm font-medium">Saved! 💙</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Secret Message Popup */}
+      {/* 💬 Secret Message */}
       <AnimatePresence>
         {showSecretMessage && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-pink-500 to-purple-600 text-white p-6 rounded-2xl shadow-2xl max-w-md"
+          <motion.div initial={{ opacity: 0, scale: 0.94, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }}
+            transition={{ type: "spring", damping: 24 }}
+            className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r ${t.gradient} text-white px-6 py-4 rounded-xl shadow-2xl max-w-sm text-center`}
           >
-            <p className="text-center">{secretMessage}</p>
+            <Cake className="w-10 h-10 mx-auto mb-3" />
+            <p className="text-sm leading-relaxed">{secretMessage}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
+      {/* 🎂 Main Content */}
       <div className="container mx-auto px-4 py-8 relative z-10">
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-4xl mx-auto"
+          <motion.div key={currentStep} variants={fadeInUp} initial="hidden" animate="visible" exit={{ opacity: 0, y: -30 }}
+            className="max-w-3xl mx-auto"
           >
             {/* Step 1: Opening */}
             {currentStepData.type === "opening" && (
-              <div className="text-center py-16 min-h-screen flex flex-col justify-center">
-                <motion.div
-                  initial={{ scale: 0, rotateY: 180 }}
-                  animate={{ scale: 1, rotateY: 0 }}
-                  transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
-                  className="w-96 h-96 mx-auto mb-10 rounded-full overflow-hidden border-8 border-white shadow-2xl relative group"
+              <div className="text-center py-16 md:py-24 min-h-screen flex flex-col justify-center">
+                {/* Photo - Square, elegant */}
+                <motion.div variants={scaleIn}
+                  className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl relative group"
                 >
-                  <img 
-                    src={currentStepData.image} 
-                    alt="Haejay"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  <img src={currentStepData.image} alt="You" 
+                    className={`w-full h-full object-cover transition-transform duration-700 ${loadedImages[currentStepData.image] ? 'opacity-100' : 'opacity-0'}`} 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Sparkles className="w-6 h-6 text-pink-500" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </motion.div>
                 
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="mb-8"
-                >
-                  <Heart className="w-20 h-20 mx-auto mb-6 text-pink-500 animate-pulse" />
-                  <h1 className="text-6xl md:text-8xl font-black text-pink-600 mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
+                {/* Text - staggered entrance */}
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="mb-12 px-4">
+                  <motion.div variants={floatSlow} className="mb-6">
+                    <Cake className="w-16 h-16 mx-auto text-blue-400" />
+                  </motion.div>
+                  <motion.h1 variants={fadeInUp} className={`text-4xl md:text-5xl font-semibold ${t.accent} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>
                     {currentStepData.title}
-                  </h1>
-                  <p className={`text-2xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-4 max-w-2xl mx-auto leading-relaxed`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  </motion.h1>
+                  <motion.p variants={fadeInUp} className={`text-lg ${t.textMuted} mb-5 max-w-lg mx-auto leading-relaxed`} style={{ fontFamily: 'Inter, sans-serif' }}>
                     {currentStepData.message}
-                  </p>
-                  <p className="text-xl text-pink-500 font-semibold mb-8" style={{ fontFamily: 'Dancing Script, cursive' }}>
+                  </motion.p>
+                  <motion.p variants={fadeInUp} className={`text-base ${t.accent}`} style={{ fontFamily: 'Dancing Script, cursive' }}>
                     {currentStepData.personalMessage}
-                  </p>
+                  </motion.p>
                 </motion.div>
 
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1, type: "spring" }}
+                {/* Button - smooth entrance */}
+                <motion.button variants={fadeInUp} whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.98 }}
                   onClick={nextStep}
-                  className="group px-16 py-5 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full text-xl font-bold hover:from-purple-600 hover:to-pink-500 transition-all duration-500 shadow-2xl hover:shadow-4xl flex items-center gap-4 mx-auto transform hover:scale-110 hover:-translate-y-2"
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                  className={`group px-8 py-3.5 bg-gradient-to-r ${t.gradient} text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-400 flex items-center gap-2 mx-auto`}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  <Sparkles className="w-6 h-6 group-hover:rotate-180 transition-transform duration-500" />
+                  <PartyPopper className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                   {currentStepData.buttonText}
-                  <Heart className="w-6 h-6 group-hover:scale-125 group-hover:rotate-12 transition-transform duration-500" />
+                  <Heart className="w-4 h-4 text-white/90" />
                 </motion.button>
               </div>
             )}
 
-            {/* Step 2: Certificate - VERSI SWEET DAN PERSONAL */}
-            {currentStepData.type === "certificate" && (
-              <div className="py-8 min-h-screen flex items-center justify-center">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, type: "spring" }}
-                  className="w-full max-w-4xl"
-                >
-                  {/* Main Love Certificate */}
-                  <div className={`${isDarkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-white via-indigo-50 to-purple-50'} rounded-3xl shadow-2xl overflow-hidden border-2 ${isDarkMode ? 'border-slate-700' : 'border-indigo-200'} backdrop-blur-sm`}>
-                    
-                    {/* Header dengan tema cinta */}
-                    <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white py-12 text-center relative overflow-hidden">
+            {/* Step 2: Birthday Wish */}
+            {currentStepData.type === "birthday_wish" && (
+              <div className="py-10 md:py-16 min-h-screen flex items-center justify-center">
+                <motion.div variants={scaleIn} initial="hidden" animate="visible" className="w-full">
+                  <div className={`${t.card} rounded-2xl shadow-xl overflow-hidden border ${t.cardBorder} backdrop-blur-md`}>
+                    {/* Header */}
+                    <div className={`bg-gradient-to-r ${t.gradient} text-white py-8 text-center relative overflow-hidden`}>
                       <div className="absolute inset-0 opacity-20">
                         {[...Array(10)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            className="absolute rounded-full bg-white"
-                            style={{
-                              width: Math.random() * 30 + 10,
-                              height: Math.random() * 30 + 10,
-                              left: `${Math.random() * 100}%`,
-                              top: `${Math.random() * 100}%`,
-                            }}
-                            animate={{ scale: [0, 1, 0], rotate: [0, 360] }}
+                          <motion.div key={i} className="absolute rounded-full bg-white/50"
+                            style={{ width: Math.random() * 20 + 8, height: Math.random() * 20 + 8, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+                            animate={{ scale: [0, 1, 0], rotate: [0, 180] }}
                             transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}
                           />
                         ))}
                       </div>
-                      
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.3, type: "spring" }}
-                        className="relative z-10"
-                      >
-                        <div className="flex justify-center items-center gap-4 mb-6">
-                          <Heart className="w-16 h-16 text-pink-200 animate-pulse" />
-                          <GraduationCap className="w-14 h-14 text-white" />
-                          <Heart className="w-16 h-16 text-pink-200 animate-pulse" />
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-black mb-4 text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
-                          {currentStepData.title}
-                        </h1>
-                        <p className="text-xl text-pink-100" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                          {currentStepData.message}
-                        </p>
+                      <motion.div variants={fadeInUp} className="relative z-10 px-4">
+                        <motion.div animate={floatSlow} className="mb-4">
+                          <Cake className="w-12 h-12 mx-auto text-white/90" />
+                        </motion.div>
+                        <h2 className="text-2xl md:text-3xl font-semibold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{currentStepData.title}</h2>
+                        <p className="text-blue-100 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>{currentStepData.message}</p>
                       </motion.div>
                     </div>
 
-                    {/* Certificate Content */}
-                    <div className="p-8">
-                      <div className="text-center mb-8">
-                        <motion.p
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                          className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6 leading-relaxed`}
-                          style={{ fontFamily: 'Poppins, sans-serif' }}
-                        >
-                          {typewriterText || currentStepData.personalMessage}
-                        </motion.p>
-                      </div>
+                    {/* Content */}
+                    <div className="p-6 space-y-6">
+                      {/* Typewriter text */}
+                      <motion.p variants={fadeInUp} className={`text-center ${t.textMuted} leading-relaxed`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {typewriterText || currentStepData.personalMessage}
+                      </motion.p>
 
-                      {/* Certificate Preview */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
-                        className="relative mb-8"
-                      >
-                        <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                          <img 
-                            src={currentStepData.image} 
-                            alt="Piagam Kebanggaan"
-                            className="w-full h-auto"
-                          />
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                          className="absolute -top-3 -right-3 bg-gradient-to-r from-pink-400 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg cursor-pointer"
+                      {/* Image */}
+                      <motion.div variants={fadeInUp} className="relative rounded-xl overflow-hidden shadow-lg border-2 border-white">
+                        <img src={currentStepData.image} alt="Wish" className="w-full h-auto" />
+                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}
+                          className={`absolute -top-2 -right-2 bg-gradient-to-r ${t.gradient} text-white px-3 py-1.5 rounded-full text-xs font-medium shadow cursor-pointer`}
                           onClick={revealSecretMessage}
                         >
-                          💝 Klik Aku!
+                          💙 Tap
                         </motion.button>
                       </motion.div>
 
-                      {/* Love Notes */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1 }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
-                      >
-                        {currentStepData.loveNotes.map((note, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 + 1.2 }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            className={`p-4 ${isDarkMode ? 'bg-slate-700' : 'bg-white/80'} backdrop-blur-sm rounded-xl shadow-lg border ${isDarkMode ? 'border-slate-600' : 'border-indigo-100'} hover:shadow-xl transition-all duration-300`}
+                      {/* Notes - staggered grid */}
+                      <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {currentStepData.loveNotes.map((note, i) => (
+                          <motion.div key={i} variants={i % 2 === 0 ? fadeInLeft : fadeInRight}
+                            whileHover={{ y: -2 }} className={`p-4 rounded-lg ${isDarkMode ? 'bg-slate-700/50' : 'bg-blue-50/50'} border ${t.cardBorder}`}
                           >
-                            <p className={isDarkMode ? "text-gray-300" : "text-gray-700"} style={{ fontFamily: 'Poppins, sans-serif' }}>{note}</p>
+                            <p className={`text-sm ${t.textMuted} leading-relaxed flex items-start gap-2`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                              <Star className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" /> {note}
+                            </p>
                           </motion.div>
                         ))}
                       </motion.div>
 
-                      {/* Personal Signature */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.5 }}
-                        className={`text-center border-t ${isDarkMode ? 'border-slate-700' : 'border-indigo-200'} pt-6`}
-                      >
-                        <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`} style={{ fontFamily: 'Poppins, sans-serif' }}>Dengan penuh cinta dan kebanggaan,</p>
-                        <p className="text-xl font-bold text-pink-500" style={{ fontFamily: 'Dancing Script, cursive' }}>Pacarmu yang selalu menyayangimu</p>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`} style={{ fontFamily: 'Poppins, sans-serif' }}>November 2024</p>
+                      {/* Signature */}
+                      <motion.div variants={fadeInUp} className={`text-center pt-4 border-t ${t.cardBorder}`}>
+                        <p className={`text-sm ${t.textLight}`} style={{ fontFamily: 'Inter, sans-serif' }}>With warmth,</p>
+                        <p className={`text-base font-medium ${t.accent} mt-1`} style={{ fontFamily: 'Dancing Script, cursive' }}>Someone who's glad you're here</p>
                       </motion.div>
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 2 }}
-                    className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8"
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
+                  {/* Actions */}
+                  <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 justify-center mt-6">
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                       onClick={openCertificateModal}
-                      className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-semibold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-xl"
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r ${t.gradient} text-white font-medium shadow hover:shadow-md transition-all`}
                     >
-                      <Award size={20} />
-                      Lihat Detail Piagam
+                      <Gift size={16} /> See the note
                     </motion.button>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                       onClick={shareMessage}
-                      className={`flex items-center gap-3 px-8 py-4 ${isDarkMode ? 'bg-slate-700' : 'bg-white'} border-2 ${isDarkMode ? 'border-slate-600' : 'border-indigo-300'} text-pink-500 rounded-full font-semibold ${isDarkMode ? 'hover:bg-slate-600' : 'hover:bg-indigo-50'} transition-all duration-300 shadow-lg hover:shadow-xl`}
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full ${isDarkMode ? 'bg-slate-700/70' : 'bg-white/80'} ${t.text} border ${t.cardBorder} font-medium hover:shadow transition-all backdrop-blur-sm`}
                     >
-                      <Share2 size={20} />
-                      Bagikan Kebahagiaan
+                      <Share2 size={16} /> Share
                     </motion.button>
                   </motion.div>
 
-                  {/* Navigation */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 2.2 }}
-                    className="flex justify-center gap-4 mt-6"
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.05, x: -5 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={prevStep}
-                      className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-slate-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-full ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-indigo-400'} transition-all duration-300`}
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                  {/* Nav */}
+                  <motion.div variants={fadeInUp} className="flex justify-center gap-4 mt-6">
+                    <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.97 }}
+                      onClick={prevStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${isDarkMode ? 'bg-slate-700/70' : 'bg-white/80'} ${t.textMuted} border ${t.cardBorder} text-sm backdrop-blur-sm`}
                     >
-                      <ArrowLeft size={18} />
-                      Sebelumnya
+                      <ChevronLeft size={14} /> Back
                     </motion.button>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05, x: 5 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={nextStep}
-                      className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-pink-500 hover:to-purple-500 transition-all duration-300"
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                    <motion.button whileHover={{ x: 3 }} whileTap={{ scale: 0.97 }}
+                      onClick={nextStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r ${t.gradient} text-white text-sm font-medium shadow`}
                     >
-                      Lanjut
-                      <ArrowRight size={18} />
+                      Next <ChevronRight size={14} />
                     </motion.button>
                   </motion.div>
                 </motion.div>
               </div>
             )}
 
-            {/* Step 3: Memories */}
+            {/* Step 3: Memories - Fixed Grid */}
             {currentStepData.type === "memories" && (
-              <div className="py-8 min-h-screen flex flex-col justify-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center mb-8"
-                >
-                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>
-                    {currentStepData.title}
-                  </h1>
-                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    {currentStepData.message}
-                  </p>
+              <div className="py-10 md:py-16 min-h-screen flex flex-col justify-center">
+                <motion.div variants={fadeInUp} className="text-center mb-8">
+                  <h2 className={`text-3xl md:text-4xl font-semibold ${t.text} mb-2`} style={{ fontFamily: 'Playfair Display, serif' }}>{currentStepData.title}</h2>
+                  <p className={`${t.textMuted}`} style={{ fontFamily: 'Inter, sans-serif' }}>{currentStepData.message}</p>
                 </motion.div>
 
-                {/* Image Carousel */}
+                {/* Carousel - Square images, proper aspect ratio */}
                 <div className="relative mb-8">
-                  <div className="overflow-hidden rounded-3xl shadow-2xl">
-                    <motion.div
-                      className="flex"
-                      animate={{ x: -currentImageIndex * 100 + "%" }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    >
+                  <div className="overflow-hidden rounded-2xl shadow-xl">
+                    <motion.div className="flex" animate={{ x: `-${currentImageIndex * 100}%` }} transition={{ type: "spring", stiffness: 280, damping: 28 }}>
                       {currentStepData.images.map((image, index) => (
                         <div key={index} className="w-full flex-shrink-0">
-                          <div className="relative">
-                            <img 
-                              src={image.src} 
-                              alt={image.caption}
-                              className="w-full h-auto object-cover rounded-t-3xl"
+                          {/* Square image container - no cropping */}
+                          <div className="relative aspect-square">
+                            <img src={image.src} alt={image.caption} 
+                              className={`w-full h-full object-cover transition-transform duration-500 ${loadedImages[image.src] ? 'opacity-100' : 'opacity-0'}`} 
                             />
-                            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-t-3xl`}></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                              <p className="text-white text-sm font-medium">{image.description}</p>
+                            </div>
                           </div>
-                          <div className={`p-6 ${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded-b-3xl`}>
-                            <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`} style={{ fontFamily: 'Playfair Display, serif' }}>{image.caption}</h3>
-                            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`} style={{ fontFamily: 'Poppins, sans-serif' }}>{image.description}</p>
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`} style={{ fontFamily: 'Poppins, sans-serif' }}>{image.date}</p>
+                          <div className={`p-4 ${isDarkMode ? 'bg-slate-800/80' : 'bg-white/90'} backdrop-blur-sm`}>
+                            <h3 className={`font-medium ${t.text} mb-0.5`} style={{ fontFamily: 'Playfair Display, serif' }}>{image.caption}</h3>
+                            <p className={`text-xs ${t.textLight}`} style={{ fontFamily: 'Inter, sans-serif' }}>{image.date}</p>
                           </div>
                         </div>
                       ))}
                     </motion.div>
                   </div>
 
-                  {/* Carousel Controls */}
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
-                  >
-                    <ChevronLeft size={24} className="text-gray-800" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
-                  >
-                    <ChevronRight size={24} className="text-gray-800" />
-                  </button>
+                  {/* Controls */}
+                  {[{ onClick: prevImage, icon: ChevronLeft, pos: 'left-3' }, { onClick: nextImage, icon: ChevronRight, pos: 'right-3' }].map((btn, i) => (
+                    <motion.button key={i} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
+                      onClick={btn.onClick}
+                      className={`absolute ${btn.pos} top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors z-10`}
+                    >
+                      <btn.icon size={18} className="text-slate-700" />
+                    </motion.button>
+                  ))}
 
-                  {/* Carousel Indicators */}
-                  <div className="flex justify-center mt-4 gap-2">
-                    {currentStepData.images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`w-3 h-3 rounded-full ${index === currentImageIndex ? 'bg-pink-500' : 'bg-gray-300'}`}
+                  {/* Indicators */}
+                  <div className="flex justify-center gap-2 mt-4">
+                    {currentStepData.images.map((_, i) => (
+                      <motion.button key={i} whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${i === currentImageIndex ? 'bg-blue-400 scale-110' : 'bg-slate-300 hover:bg-slate-400'}`}
                       />
                     ))}
                   </div>
                 </div>
 
-                {/* Photo Gallery Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                  {[fs1, fs2, fs3, fs4, jay1, jaypp1, jaywisuda2].map((photo, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1 + 0.5 }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      className="relative rounded-full overflow-hidden shadow-lg"
+                {/* Gallery Grid - Fixed: Square/Portrait, no landscape cutoff */}
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" 
+                  className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 md:gap-3 mb-8"
+                >
+                  {[firstmeet, fs1, fs2, kaputra1, kaputra2, kaputra3, kaputra4, kaputra5].map((photo, i) => (
+                    <motion.div key={i} variants={scaleIn} whileHover={{ scale: 1.04, y: -3 }}
+                      className="relative aspect-square rounded-xl overflow-hidden shadow-md group cursor-pointer"
                     >
-                      <img 
-                        src={photo} 
-                        alt={`Memory ${index + 1}`}
-                        className="w-full h-full object-cover"
+                      <img src={photo} alt={`Memory ${i+1}`} 
+                        className={`w-full h-full object-cover transition-transform duration-400 group-hover:scale-105 ${loadedImages[photo] ? 'opacity-100' : 'opacity-0'}`} 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
-                {/* Navigation */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex justify-center gap-4 mt-8"
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={prevStep}
-                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-slate-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-full ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-indigo-400'} transition-all duration-300`}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                {/* Nav */}
+                <motion.div variants={fadeInUp} className="flex justify-center gap-4">
+                  <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.97 }}
+                    onClick={prevStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${isDarkMode ? 'bg-slate-700/70' : 'bg-white/80'} ${t.textMuted} border ${t.cardBorder} text-sm backdrop-blur-sm`}
                   >
-                    <ArrowLeft size={18} />
-                    Sebelumnya
+                    <ChevronLeft size={14} /> Back
                   </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={nextStep}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-pink-500 hover:to-purple-500 transition-all duration-300"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  <motion.button whileHover={{ x: 3 }} whileTap={{ scale: 0.97 }}
+                    onClick={nextStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r ${t.gradient} text-white text-sm font-medium shadow`}
                   >
-                    Lanjut
-                    <ArrowRight size={18} />
+                    Next <ChevronRight size={14} />
                   </motion.button>
                 </motion.div>
               </div>
@@ -1090,115 +737,64 @@ const LuxuryGraduationPage = () => {
 
             {/* Step 4: Love Letter */}
             {currentStepData.type === "love_letter" && (
-              <div className="py-8 min-h-screen flex flex-col justify-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center mb-8"
-                >
-                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>
-                    {currentStepData.title}
-                  </h1>
-                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    {currentStepData.message}
-                  </p>
+              <div className="py-10 md:py-16 min-h-screen flex flex-col justify-center">
+                <motion.div variants={fadeInUp} className="text-center mb-8">
+                  <h2 className={`text-3xl md:text-4xl font-semibold ${t.text} mb-2`} style={{ fontFamily: 'Playfair Display, serif' }}>{currentStepData.title}</h2>
+                  <p className={`${t.textMuted}`} style={{ fontFamily: 'Inter, sans-serif' }}>{currentStepData.message}</p>
                 </motion.div>
 
-                {/* Love Letter Content */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className={`${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded-3xl shadow-2xl p-8 mb-8 max-w-3xl mx-auto`}
+                {/* Letter Card */}
+                <motion.div variants={scaleIn} initial="hidden" animate="visible"
+                  className={`${t.card} rounded-2xl shadow-xl p-6 md:p-8 mb-8 max-w-2xl mx-auto border ${t.cardBorder} backdrop-blur-md`}
                 >
-                  <div className={`${isDarkMode ? 'bg-slate-700' : 'bg-indigo-50'} rounded-2xl p-6 mb-6`}>
-                    {currentStepData.letter.map((line, index) => (
-                      <motion.p
-                        key={index}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: index * 0.1 + 0.5 }}
-                        className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} ${line === '' ? 'mb-2' : 'mb-1'} ${line.startsWith('-') ? 'ml-6' : ''}`}
-                        style={{ fontFamily: 'Poppins, sans-serif' }}
-                      >
-                        {line}
-                      </motion.p>
+                  <div className={`${isDarkMode ? 'bg-slate-700/40' : 'bg-blue-50/50'} rounded-xl p-5 mb-6 border ${t.cardBorder}`}>
+                    {currentStepData.letter.map((line, i) => (
+                      <motion.p key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.05 + 0.3 }}
+                        className={`${t.textMuted} ${line === '' ? 'my-4' : 'my-1'} ${line.startsWith('-') ? 'ml-4' : ''} ${line.startsWith('Hey') ? 'font-medium text-blue-400' : ''}`}
+                        style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.7' }}
+                      >{line}</motion.p>
                     ))}
                   </div>
                   
                   <div className="text-center">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 2, type: "spring" }}
-                      className="inline-block"
-                    >
-                      <Heart className="w-16 h-16 text-pink-500 mx-auto mb-4" />
-                      <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} italic`} style={{ fontFamily: 'Dancing Script, cursive' }}>With all my love, always</p>
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2, type: "spring" }}>
+                      <motion.div animate={pulseSoft}>
+                        <Heart className="w-10 h-10 mx-auto text-blue-400 mb-3" />
+                      </motion.div>
+                      <p className={`text-sm ${t.textLight} italic`} style={{ fontFamily: 'Dancing Script, cursive' }}>– always</p>
                     </motion.div>
                   </div>
                 </motion.div>
 
-                {/* Photo Collage */}
-                <div className="grid grid-cols-3 gap-2 mb-8 max-w-2xl mx-auto">
+                {/* Photo Collage - Square layout */}
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" 
+                  className="grid grid-cols-3 gap-2.5 mb-8 max-w-md mx-auto"
+                >
                   <div className="col-span-2 row-span-2">
-                    <motion.img
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5 }}
-                      whileHover={{ scale: 1.05 }}
-                      src={jaywisuda2}
-                      alt="Graduation"
-                      className="w-full h-full object-cover rounded-2xl shadow-lg"
+                    <motion.img variants={scaleIn} whileHover={{ scale: 1.02 }}
+                      src={kaputra6} alt="Moment" className="w-full h-full aspect-square object-cover rounded-xl shadow-md" 
                     />
                   </div>
-                  <motion.img
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 }}
-                    whileHover={{ scale: 1.05 }}
-                    src={jay1}
-                    alt="Jay 1"
-                    className="w-full h-full object-cover rounded-2xl shadow-lg"
+                  <motion.img variants={scaleIn} whileHover={{ scale: 1.02 }}
+                    src={kaputra7} alt="Moment" className="w-full h-full aspect-square object-cover rounded-xl shadow-md" 
                   />
-                  <motion.img
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.7 }}
-                    whileHover={{ scale: 1.05 }}
-                    src={jaypp1}
-                    alt="Jay PP"
-                    className="w-full h-full object-cover rounded-2xl shadow-lg"
+                  <motion.img variants={scaleIn} whileHover={{ scale: 1.02 }}
+                    src={kaputra8} alt="Moment" className="w-full h-full aspect-square object-cover rounded-xl shadow-md" 
                   />
-                </div>
+                </motion.div>
 
-                {/* Navigation */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex justify-center gap-4 mt-8"
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={prevStep}
-                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-slate-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-full ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-indigo-400'} transition-all duration-300`}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                {/* Nav */}
+                <motion.div variants={fadeInUp} className="flex justify-center gap-4">
+                  <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.97 }}
+                    onClick={prevStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${isDarkMode ? 'bg-slate-700/70' : 'bg-white/80'} ${t.textMuted} border ${t.cardBorder} text-sm backdrop-blur-sm`}
                   >
-                    <ArrowLeft size={18} />
-                    Sebelumnya
+                    <ChevronLeft size={14} /> Back
                   </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={nextStep}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-pink-500 hover:to-purple-500 transition-all duration-300"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  <motion.button whileHover={{ x: 3 }} whileTap={{ scale: 0.97 }}
+                    onClick={nextStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r ${t.gradient} text-white text-sm font-medium shadow`}
                   >
-                    Lanjut
-                    <ArrowRight size={18} />
+                    Next <ChevronRight size={14} />
                   </motion.button>
                 </motion.div>
               </div>
@@ -1206,124 +802,80 @@ const LuxuryGraduationPage = () => {
 
             {/* Step 5: Future */}
             {currentStepData.type === "future" && (
-              <div className="py-8 min-h-screen flex flex-col justify-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center mb-8"
-                >
-                  <h1 className={`text-5xl md:text-6xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>
-                    {currentStepData.title}
-                  </h1>
-                  <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    {currentStepData.message}
-                  </p>
+              <div className="py-10 md:py-16 min-h-screen flex flex-col justify-center">
+                <motion.div variants={fadeInUp} className="text-center mb-8">
+                  <h2 className={`text-3xl md:text-4xl font-semibold ${t.text} mb-2`} style={{ fontFamily: 'Playfair Display, serif' }}>{currentStepData.title}</h2>
+                  <p className={`${t.textMuted}`} style={{ fontFamily: 'Inter, sans-serif' }}>{currentStepData.message}</p>
                 </motion.div>
 
-                {/* Future Dreams Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  {currentStepData.dreams.map((dream, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.2 + 0.3 }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      className={`${isDarkMode ? 'bg-slate-800' : 'bg-white'} rounded-3xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300`}
+                {/* Dreams - Clean cards */}
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" 
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+                >
+                  {currentStepData.dreams.map((dream, i) => (
+                    <motion.div key={i} variants={i % 2 === 0 ? fadeInLeft : fadeInRight}
+                      whileHover={{ y: -3 }} className={`${t.card} rounded-xl p-5 shadow-md border ${t.cardBorder} backdrop-blur-sm`}
                     >
-                      <div className="text-5xl mb-4 text-center">{dream.icon}</div>
-                      <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2 text-center`} style={{ fontFamily: 'Playfair Display, serif' }}>{dream.title}</h3>
-                      <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-center`} style={{ fontFamily: 'Poppins, sans-serif' }}>{dream.description}</p>
+                      <motion.div className="text-3xl mb-3 text-center" whileHover={{ scale: 1.15, rotate: 3 }}>{dream.icon}</motion.div>
+                      <h3 className={`font-medium ${t.text} text-center mb-1`} style={{ fontFamily: 'Playfair Display, serif' }}>{dream.title}</h3>
+                      <p className={`text-sm ${t.textMuted} text-center leading-relaxed`} style={{ fontFamily: 'Inter, sans-serif' }}>{dream.description}</p>
                     </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
-                {/* Photo Gallery */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  {[fs1, fs2, fs3, fs4].map((photo, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1 + 0.5 }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      className="relative rounded-full overflow-hidden shadow-lg"
+                {/* Mini Gallery - Square */}
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" 
+                  className="grid grid-cols-4 gap-2.5 mb-8 max-w-xs mx-auto"
+                >
+                  {[kaputra1, kaputra2, kaputra3, kaputra4].map((photo, i) => (
+                    <motion.div key={i} variants={scaleIn} whileHover={{ scale: 1.08, y: -2 }}
+                      className="relative aspect-square rounded-full overflow-hidden shadow-md group"
                     >
-                      <img 
-                        src={photo} 
-                        alt={`Memory ${index + 1}`}
-                        className="w-full h-full object-cover"
+                      <img src={photo} alt={`Hope ${i+1}`} 
+                        className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 ${loadedImages[photo] ? 'opacity-100' : 'opacity-0'}`} 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* Final Message */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2 }}
-                  className={`${isDarkMode ? 'bg-slate-800' : 'bg-gradient-to-r from-indigo-100 to-purple-100'} rounded-3xl p-8 text-center mb-8`}
+                <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+                  className={`${isDarkMode ? 'bg-slate-800/60' : 'bg-blue-50/60'} backdrop-blur-sm rounded-xl p-6 text-center mb-8 border ${t.cardBorder}`}
                 >
-                  <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`} style={{ fontFamily: 'Playfair Display, serif' }}>"I can’t wait to start a new chapter with you!"
-</h2>
-<p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-6`} style={{ fontFamily: 'Poppins, sans-serif' }}>Thank you for being an inspiration in my life. I will always be there for you, through joys and sorrows.</p>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setShowConfetti(true);
-                      setTimeout(() => setShowConfetti(false), 8000);
-                    }}
-                    className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full font-bold hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  <h3 className={`text-xl font-semibold ${t.text} mb-3`} style={{ fontFamily: 'Playfair Display, serif' }}>Here's to what's ahead.</h3>
+                  <p className={`text-sm ${t.textMuted} mb-4 leading-relaxed`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                    However this year unfolds, I hope it brings you moments that feel like this: real, warm, and yours.
+                  </p>
+                  <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}
+                    onClick={() => { setShowConfetti(true); setTimeout(() => setShowConfetti(false), 8000); }}
+                    className={`px-6 py-2.5 bg-gradient-to-r ${t.gradient} text-white rounded-full font-medium shadow hover:shadow-md transition-all flex items-center gap-2 mx-auto`}
                   >
-                      Rayakan Bersama!
+                    <PartyPopper className="w-4 h-4" /> Celebrate
                   </motion.button>
                 </motion.div>
 
-                {/* Navigation */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.5 }}
-                  className="flex justify-center"
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={prevStep}
-                    className={`flex items-center gap-2 px-6 py-3 ${isDarkMode ? 'bg-slate-700' : 'bg-white/80'} backdrop-blur-sm border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} rounded-full ${isDarkMode ? 'hover:border-pink-400' : 'hover:border-indigo-400'} transition-all duration-300`}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                {/* Nav */}
+                <motion.div variants={fadeInUp} className="flex justify-center">
+                  <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.97 }}
+                    onClick={prevStep} className={`flex items-center gap-1.5 px-4 py-2 rounded-full ${isDarkMode ? 'bg-slate-700/70' : 'bg-white/80'} ${t.textMuted} border ${t.cardBorder} text-sm backdrop-blur-sm`}
                   >
-                    <ArrowLeft size={18} />
-                    Kembali
+                    <ChevronLeft size={14} /> Back
                   </motion.button>
                 </motion.div>
               </div>
             )}
-
           </motion.div>
         </AnimatePresence>
 
         {/* Progress Dots */}
         {currentStep > 0 && currentStep < steps.length && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center gap-3 mt-8"
-          >
-            {steps.map((_, index) => (
-              <motion.button
-                key={index}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.8 }}
-                onClick={() => setCurrentStep(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentStep ? 
-                  'bg-pink-500 scale-125' : 
-                  isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-gray-300 hover:bg-gray-400'
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center gap-2.5 mt-6">
+            {steps.map((_, i) => (
+              <motion.button key={i} whileHover={{ scale: 1.25 }} whileTap={{ scale: 0.9 }}
+                onClick={() => setCurrentStep(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  i === currentStep ? 'bg-blue-400 scale-110 shadow shadow-blue-400/40' : isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-slate-300 hover:bg-slate-400'
                 }`}
               />
             ))}
@@ -1331,36 +883,25 @@ const LuxuryGraduationPage = () => {
         )}
       </div>
 
-      {/* Floating Geometric Elements */}
+      {/* Bottom floating layer - subtle */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            initial={{ 
-              x: Math.random() * windowSize.width,
-              y: windowSize.height + 100,
-              rotate: Math.random() * 360,
-              scale: Math.random() * 0.5 + 0.5
-            }}
+        {[...Array(10)].map((_, i) => (
+          <motion.div key={i} className="absolute"
+            initial={{ x: Math.random() * windowSize.width, y: windowSize.height + 80, rotate: Math.random() * 360 }}
             animate={{
-              y: -100,
-              x: Math.random() * windowSize.width - windowSize.width / 2,
-              rotate: Math.random() * 720,
-              scale: [1, 1.2, 1]
+              y: -80,
+              x: Math.random() * 150 - 75,
+              rotate: Math.random() * 540,
+              opacity: [0.3, 0.6, 0.3]
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: 14 + Math.random() * 10,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: Math.random() * 4,
               ease: "easeInOut"
             }}
           >
-            {i % 3 === 0 ? 
-              <div className={`w-4 h-4 rounded-full ${isDarkMode ? 'bg-pink-400/30' : 'bg-pink-300/30'}`}></div> : 
-              i % 3 === 1 ? 
-              <div className={`w-4 h-4 ${isDarkMode ? 'bg-purple-400/30' : 'bg-purple-300/30'}`}></div> : 
-              <div className={`w-4 h-4 ${isDarkMode ? 'bg-blue-400/30' : 'bg-blue-300/30'}`}></div>}
+            <div className={`w-2 h-2 rounded-full ${t.floating}`} />
           </motion.div>
         ))}
       </div>
@@ -1368,4 +909,4 @@ const LuxuryGraduationPage = () => {
   );
 };
 
-export default LuxuryGraduationPage;
+export default LuxuryBirthdayPage;
